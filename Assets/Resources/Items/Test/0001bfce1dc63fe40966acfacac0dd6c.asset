@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c9242c7b23eec444a5eb5c6f37abb5c, type: 3}
+  m_Name: 0001bfce1dc63fe40966acfacac0dd6c
+  m_EditorClassIdentifier: 
+  _name: pluto
+  maxQuantity: -1
+  maxQuantityPerSlot: 20
