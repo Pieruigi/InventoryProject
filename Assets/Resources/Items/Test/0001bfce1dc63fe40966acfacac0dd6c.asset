@@ -13,5 +13,11 @@ MonoBehaviour:
   m_Name: 0001bfce1dc63fe40966acfacac0dd6c
   m_EditorClassIdentifier: 
   _name: pluto
+  shortDesc: 
+  longDesc: 
   maxQuantity: -1
   maxQuantityPerSlot: 20
+  multipleSlots: 0
+  slotShape: {x: 5, y: 3}
+  icon: {fileID: 0}
+  asset: {fileID: 0}

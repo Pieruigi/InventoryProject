@@ -13,5 +13,11 @@ MonoBehaviour:
   m_Name: ce236d9ed2b27a6488bf64b2da724ca5
   m_EditorClassIdentifier: 
   _name: minnie
+  shortDesc: 
+  longDesc: 
   maxQuantity: -1
   maxQuantityPerSlot: 20
+  multipleSlots: 0
+  slotShape: {x: 2, y: 3}
+  icon: {fileID: 0}
+  asset: {fileID: 0}

@@ -15,11 +15,24 @@ public class _InventoryTest : MonoBehaviour
     [SerializeField]
     InputField singleAddCount;
 
+    
     [SerializeField]
     Button addBtn;
 
     [SerializeField]
     Button removeBtn;
+
+    [SerializeField]
+    Button btnCountByName;
+
+    [SerializeField]
+    Button btnCountByIndex;
+
+    [SerializeField]
+    Button btnGetByIndex;
+
+    [SerializeField]
+    Text txtGetResult;
 
     List<TestItem> items;
 
@@ -38,6 +51,9 @@ public class _InventoryTest : MonoBehaviour
         
         addBtn.onClick.AddListener( HandleAddOnClick);
         removeBtn.onClick.AddListener(HandleDelOnClick);
+        btnGetByIndex.onClick.AddListener(HandleGetByIndexOnClick);
+        btnCountByName.onClick.AddListener(HandleCountByNameOnClick);
+        btnCountByIndex.onClick.AddListener(HandleCountByIndexOnClick);
 
         // Load all the resources
         items = new List<TestItem>( Resources.LoadAll<TestItem>("Items/Test"));
@@ -81,6 +97,28 @@ public class _InventoryTest : MonoBehaviour
         Debug.Log("removed:" + count);
 
     }
+
+    void HandleCountByNameOnClick()
+    {
+        SetData();
+        int count = Inventory.Instance.GetQuantity(item);
+        txtGetResult.text = count.ToString();
+    }
+
+    void HandleCountByIndexOnClick()
+    {
+        SetData();
+        int count = Inventory.Instance.GetQuantity(slot);
+        txtGetResult.text = count.ToString();
+    }
+
+    void HandleGetByIndexOnClick()
+    {
+        SetData();
+        Item i = Inventory.Instance.GetItem(slot);
+        txtGetResult.text = i.Name;
+    }
+
 
     void SetData()
     {

@@ -49,9 +49,18 @@ namespace OMTB.Gameplay
         public int Rows { get { return rows; } }
         public int Columns { get { return columns; } }
 
+
         #region PRIVATE
         Slot[] slots; // The item list
         int rows, columns;
+
+        /**
+         * This is form multislots items support. 
+         * If an item take more than one slot to be stored, the there will be a root slot storing item data and al the other slots null. 
+         * The root slot is the upper left one.
+         * */
+        int[] roots; // Used to manage multislots items; roots[i] = j means that slots[i] is null and belong to slots[j] which contains a big item
+
         #endregion
 
         private void Awake()
@@ -64,7 +73,10 @@ namespace OMTB.Gameplay
                 Instance.rows = config.Rows;
                 Instance.columns = config.Columns;
                 Instance.slots = new Slot[rows*columns];
-               
+                Instance.roots = new int[rows * columns];
+                // Init parents
+                for (int i = 0; i < roots.Length; i++)
+                    roots[i] = -1;
 
                 // Get data from chache
                 //TryLoadFromCache();
@@ -113,6 +125,12 @@ namespace OMTB.Gameplay
         {
             ValidateIndex(index);
 
+            if (IsEmpty(index))
+                return 0;
+            
+            if (roots[index] >= 0) // I know slots[index] is not empty thanks to IsEmpty()
+                return slots[roots[index]].Quantity; // Gets the root
+            
             return slots[index].Quantity;
         }
 
@@ -120,12 +138,18 @@ namespace OMTB.Gameplay
         {
             ValidateIndex(index);
 
-            return slots[index] == null;
+            return ( slots[index] == null && roots[index] == -1);
         }
 
         public Item GetItem(int index)
         {
             ValidateIndex(index);
+
+            if (IsEmpty(index))
+                return null;
+
+            if (roots[index] >= 0) // I know slots[index] is not empty thanks to IsEmpty()
+                return slots[roots[index]].Item; // Gets the root
 
             return slots[index].Item;
         }
@@ -329,9 +353,16 @@ namespace OMTB.Gameplay
         {
             Debug.Log(string.Format("Single item add: {0}, index: {1}, quantity: {2}", item, index, quantity));
 
-            // Check the slot is not occupied by another item
-            if (slots[index] != null && slots[index].Item != item)
+            if (!IsEmpty(index) && GetItem(index) != item)
                 return 0;
+
+            //// Check the slot is not occupied by another item
+            //if (slots[index] != null && slots[index].Item != item)
+            //    return 0;
+
+            //// Check if the slot beholds to a multiple slots holding a different item
+            //if (slots[index] == null && roots[index] >= 0 && slots[roots[index]].Item != item)
+            //    return 0;
 
             // Ok can be added
             if (slots[index] == null)
@@ -345,9 +376,56 @@ namespace OMTB.Gameplay
             return quantity;
         }
 
+        /**
+         * The root slot is int the upper left.
+         * */
         int InternalInsertMultiple(int index, Item item, int quantity)
         {
-            return 0;
+            //// Check if there is a different item
+            //if (slots[index] != null && slots[index].Item != item)
+            //    return 0;
+
+            //// Check if the slot beholds to a multiple slots holding a different item
+            //if (slots[index] == null && roots[index] >= 0 && slots[roots[index]].Item != item)
+            //    return 0;
+
+            if (!IsEmpty(index) && GetItem(index) != item)
+                return 0;
+
+            if (index + item.SlotShape.x > rows || index + item.SlotShape.y > columns ) // It doesn't fit
+            {
+                return 0;
+            }
+
+            // I need to check if the slots starting from index and matching the item width are free NO E' DA RIFARE
+            for(int i=1; i<item.SlotShape.y; i++)
+            {
+                if (!IsEmpty(index+i) && GetItem(index+i) != item)
+                    return 0;
+            }
+            // As above but for the heigh
+            for (int i = 1; i < item.SlotShape.x; i++)
+            {
+                if (!IsEmpty(index + i*columns) && GetItem(index + i*columns) != item)
+                    return 0;
+            }
+
+            // I can use the simple slot insert code
+            int count = InternalInsertSingle(index, item, quantity);
+            if (count == 0)
+                return 0;
+
+            // Set roots
+            for (int i = 1; i < item.SlotShape.y; i++)
+            {
+                roots[index + i] = index;
+            }
+            for (int i = 1; i < item.SlotShape.x; i++)
+            {
+                roots[index + i*columns] = index;
+            }
+
+            return count;
         }
 
         int InternalInsertMultiple(Item item, int quantity)
