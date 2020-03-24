@@ -14,11 +14,11 @@ namespace OMTB.Collection
        
         public int MaxQuantity { get; set; } = -1;
 
-        public int MaxQuantityPerSlot { get; set; } = 1;
+        public int MaxQuantityPerSlot { get; set; } = -1;
 
-        public bool MultipleSlots { get; set; }
+        public bool HasBigSlot { get; set; }
 
-        public Vector2 Shape { get; set; } // Rows x columns
+        public Vector2 SlotShape { get; set; } = Vector2.one; // Rows x columns
 
     }
 
@@ -50,17 +50,17 @@ namespace OMTB.Collection
 
         [SerializeField]
         [ReadOnly]
-        private int maxQuantityPerSlot; // Negative means infinite
+        private int maxQuantityPerSlot = -1; // Negative means infinite
         public int MaxQuantityPerSlot { get { return maxQuantityPerSlot; } }
         public bool IsInfiniteQuantityPerSlot { get { return maxQuantityPerSlot < 0; } }
 
         [SerializeField]
-        [ReadOnly]
-        private bool multipleSlots = false;
-        public bool MultipleSlots { get { return multipleSlots; } }
+        //[ReadOnly]
+        private bool hasBigSlot = false;
+        public bool HasBigSlot { get { return hasBigSlot; } }
 
         [SerializeField]
-        [ReadOnly]
+        //[ReadOnly]
         private Vector2 slotShape = Vector2.one;
         public Vector2 SlotShape { get { return slotShape; } } // Rows x columns
 
@@ -92,9 +92,11 @@ namespace OMTB.Collection
                 maxQuantityPerSlot = -1;
 
             shortDesc = config.ShortDescription;
-            
-            multipleSlots = config.MultipleSlots;
-            slotShape = config.Shape;
+
+            hasBigSlot = config.HasBigSlot;
+            slotShape = config.SlotShape;
+    
+
         }
 
     }

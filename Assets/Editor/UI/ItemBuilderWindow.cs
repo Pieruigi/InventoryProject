@@ -38,7 +38,7 @@ namespace OMTB.Editor
                 {
                     Name = shortDesc,
                     MaxQuantityPerSlot = 20,
-                    MultipleSlots = false
+                    HasBigSlot = false
                 });
 
 

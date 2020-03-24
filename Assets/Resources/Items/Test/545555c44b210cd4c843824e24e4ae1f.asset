@@ -17,7 +17,7 @@ MonoBehaviour:
   longDesc: 
   maxQuantity: -1
   maxQuantityPerSlot: 20
-  multipleSlots: 0
-  slotShape: {x: 0, y: 0}
+  hasBigSlot: 0
+  slotShape: {x: 1, y: 1}
   icon: {fileID: 0}
   asset: {fileID: 0}

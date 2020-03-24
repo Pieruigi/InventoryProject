@@ -2,17 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageType : MonoBehaviour
+namespace OMTB.Collection
 {
-    // Start is called before the first frame update
-    void Start()
+    public class DamageType : ScriptableObject
     {
-        
+        //string typeName; // Ex. slashing, burning... I can set the sciptable object name itself
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

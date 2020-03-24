@@ -36,7 +36,19 @@ namespace OMTB.UI
         void CheckInventory()
         {
             if (!Inventory.Instance.IsEmpty(indexable.GetIndex()))
-                GetComponent<Text>().text = Inventory.Instance.GetQuantity(indexable.GetIndex()).ToString();
+            {
+                if (!Inventory.Instance.GetItem(indexable.GetIndex()).HasBigSlot)
+                {
+                    GetComponent<Text>().text = Inventory.Instance.GetQuantity(indexable.GetIndex()).ToString();
+                }
+                else
+                {
+                    if(Inventory.Instance.IsRoot(indexable.GetIndex()))
+                        GetComponent<Text>().text = Inventory.Instance.GetQuantity(indexable.GetIndex()).ToString();
+                    else
+                        GetComponent<Text>().text = "";
+                }
+            }
             else
                 GetComponent<Text>().text = "0";
         }

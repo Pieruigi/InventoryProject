@@ -51,6 +51,7 @@ namespace OMTB.Gameplay
 
 
         #region PRIVATE
+   
         Slot[] slots; // The item list
         int rows, columns;
 
@@ -59,6 +60,7 @@ namespace OMTB.Gameplay
          * If an item take more than one slot to be stored, the there will be a root slot storing item data and al the other slots null. 
          * The root slot is the upper left one.
          * */
+    
         int[] roots; // Used to manage multislots items; roots[i] = j means that slots[i] is null and belong to slots[j] which contains a big item
 
         #endregion
@@ -154,8 +156,83 @@ namespace OMTB.Gameplay
             return slots[index].Item;
         }
 
+        /**
+         * Returns true if the slot is the root of a multislots item.
+         * */
+        public bool IsRoot(int index)
+        {
+            ValidateIndex(index);
 
+            if (IsEmpty(index))
+                return false;
 
+            // Check if exists has root
+            for(int i=0; i<roots.Length; i++)
+            {
+                if (roots[i] == index)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * Returns the root if the index passed as parameter is part of a multislots item or if is itself the roor, otherwise returns -1.
+         * */
+        public int GetRootIndex(int index)
+        {
+            ValidateIndex(index);
+
+            
+            return roots[index];
+                
+        }
+
+        /**
+         * Returns true if the index refers to a slot beholding a multiple slot and fill the array with all the slots, otherwise returns false.
+         * */
+        public bool TryGetBigSlotIndices(int index, out int[] indices)
+        {
+            ValidateIndex(index);
+
+            indices = null;
+            
+            if (IsEmpty(index))
+                return false;
+
+            int root = -1;
+
+            // Try to find the root if exists
+            if (IsRoot(index))
+                root = index;
+            else
+                root = GetRootIndex(index);
+
+            if (root == -1) // Not a big slot
+                return false;
+
+            // Its a big slot, take the item
+            Item item = slots[root].Item;
+
+            // Init the array
+            indices = new int[(int)item.SlotShape.x*(int)item.SlotShape.y];
+
+            // Loop through all the slots beolonging to the big slot and add them to the index array
+            for(int i=0; i<item.SlotShape.x; i++)
+            {
+                for(int j =0; j<item.SlotShape.y; j++)
+                {
+                    indices[i * (int)item.SlotShape.y + j] = root + i * columns + j;
+                    Debug.Log(string.Format("Indices[{0}]: {1}", i * (int)item.SlotShape.y + j, root + i * columns + j));
+                }
+            }
+
+            
+
+            return true;
+        }
+       
+          
         #endregion
 
         #region ADD
@@ -307,7 +384,19 @@ namespace OMTB.Gameplay
 
         int InternalInsert(Item item, int quantity)
         {
-            if (!item.MultipleSlots)
+            // We can not exceed the maximum capacity for this item
+            if (!item.IsInfiniteQuantity)
+            {
+                int c = GetQuantity(item);
+                if (c + quantity > item.MaxQuantity)
+                    quantity = item.MaxQuantity - c;
+            }
+
+            // Max quantity for this item has already been reached
+            if (quantity == 0)
+                return 0;
+
+            if (!item.HasBigSlot)
                 return InternalInsertSingle(item, quantity);
             else
                 return InternalInsertMultiple(item, quantity);
@@ -328,7 +417,7 @@ namespace OMTB.Gameplay
             if (quantity == 0)
                 return 0;
 
-            if (!item.MultipleSlots)
+            if (!item.HasBigSlot)
                 return InternalInsertSingle(index, item, quantity);
             else
                 return InternalInsertMultiple(index, item, quantity);
@@ -356,14 +445,6 @@ namespace OMTB.Gameplay
             if (!IsEmpty(index) && GetItem(index) != item)
                 return 0;
 
-            //// Check the slot is not occupied by another item
-            //if (slots[index] != null && slots[index].Item != item)
-            //    return 0;
-
-            //// Check if the slot beholds to a multiple slots holding a different item
-            //if (slots[index] == null && roots[index] >= 0 && slots[roots[index]].Item != item)
-            //    return 0;
-
             // Ok can be added
             if (slots[index] == null)
                 slots[index] = new Slot(item);
@@ -381,61 +462,63 @@ namespace OMTB.Gameplay
          * */
         int InternalInsertMultiple(int index, Item item, int quantity)
         {
-            //// Check if there is a different item
-            //if (slots[index] != null && slots[index].Item != item)
-            //    return 0;
-
-            //// Check if the slot beholds to a multiple slots holding a different item
-            //if (slots[index] == null && roots[index] >= 0 && slots[roots[index]].Item != item)
-            //    return 0;
-
+            
             if (!IsEmpty(index) && GetItem(index) != item)
                 return 0;
 
-            if (index + item.SlotShape.x > rows || index + item.SlotShape.y > columns ) // It doesn't fit
+            
+            if (index/columns + item.SlotShape.x > rows || index % columns + item.SlotShape.y > columns ) // It doesn't fit
             {
                 return 0;
             }
 
-            // I need to check if the slots starting from index and matching the item width are free NO E' DA RIFARE
-            for(int i=1; i<item.SlotShape.y; i++)
+            // If at least one of the slots matching the item slot shape contains a different item or refers to a root different from the index then return
+            for (int i=0; i<item.SlotShape.x; i++)
             {
-                if (!IsEmpty(index+i) && GetItem(index+i) != item)
-                    return 0;
-            }
-            // As above but for the heigh
-            for (int i = 1; i < item.SlotShape.x; i++)
-            {
-                if (!IsEmpty(index + i*columns) && GetItem(index + i*columns) != item)
-                    return 0;
-            }
+                for(int j=0; j<item.SlotShape.y; j++)
+                {
+                    if (!IsEmpty(index + i*columns + j) && ( GetItem(index + i * columns + j) != item || roots[index + i * columns + j] != index ) )
+                        return 0;
 
-            // I can use the simple slot insert code
+                }
+            }
+            
+            // I can use the simple slot insert code to insert in the root slot
             int count = InternalInsertSingle(index, item, quantity);
             if (count == 0)
                 return 0;
 
-            // Set roots
-            for (int i = 1; i < item.SlotShape.y; i++)
+            // Set root reference
+            for (int i = 0; i < item.SlotShape.x; i++)
             {
-                roots[index + i] = index;
+                for (int j = 0; j < item.SlotShape.y; j++)
+                {
+                    roots[index + i * columns + j] = index;
+                    
+                }
             }
-            for (int i = 1; i < item.SlotShape.x; i++)
-            {
-                roots[index + i*columns] = index;
-            }
+            
 
             return count;
         }
 
         int InternalInsertMultiple(Item item, int quantity)
         {
-            return 0;
+            int tmp = quantity;
+
+            // Look for room to add the item
+            for (int i = 0; i < slots.Length && quantity > 0; i++)
+            {
+                quantity -= InternalInsertMultiple(i, item, quantity);
+
+            }
+
+            return tmp - quantity;
         }
         
         int InternalRemove(Item item, int quantity)
         {
-            if (!item.MultipleSlots)
+            if (!item.HasBigSlot)
                 return InternalRemoveSingle(item, quantity);
             else
                 return InternalRemoveMulti(item, quantity);
@@ -443,10 +526,11 @@ namespace OMTB.Gameplay
 
         int InternalRemove(int index, int quantity)
         {
-            if (slots[index] == null)
+            if (IsEmpty(index))
                 return 0;
 
-            if (!slots[index].Item.MultipleSlots)
+            
+            if (!GetItem(index).HasBigSlot)
                 return InternalRemoveSingle(index, quantity);
             else
                 return InternalRemoveMulti(index, quantity);
@@ -484,10 +568,47 @@ namespace OMTB.Gameplay
         }
 
 
-
+        /**
+         * Removes an item from the index given its quantity. Index can be the root or any other slot.
+         * */
         int InternalRemoveMulti(int index, int quantity)
         {
-            return 0;
+            if (IsEmpty(index))
+                return 0;
+
+            int root = index;
+
+            // If this is not the root then find it
+            if (!IsRoot(root))
+                root = GetRootIndex(index);
+
+            Item item = slots[root].Item; 
+
+
+            if (slots[root].Quantity <= quantity)
+            {
+                // We must remove the item so we need al the indices of the big slot
+                int[] indices;
+                if (!TryGetBigSlotIndices(root, out indices))
+                    throw new Exception(string.Format("Big slot root {0} seems to have no sub slots.", root));
+
+                quantity = slots[root].Quantity;
+                //slots[root] = null;
+                for (int i = 0; i < indices.Length; i++)
+                {
+                    slots[indices[i]] = null; // Its mandatory only for the root
+                    roots[indices[i]] = -1;
+                }
+
+            }
+            else 
+            {
+                // We don't need to remove the item in this case
+                slots[root].Quantity -= quantity;
+            }
+
+            return quantity;
+
         }
 
         int InternalRemoveMulti(Item item, int quantity)

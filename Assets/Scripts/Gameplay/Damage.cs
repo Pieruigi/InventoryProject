@@ -1,15 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using OMTB.Collection;
 
 namespace OMTB.Gameplay
 {
 
     public class DamageConfig
     {
-        public Damage.Type Type { get; set; }
-
-        public Damage.SubType SubType { get; set; }
+        public DamageType damageType;
 
         public float Total { get; set; }
         
@@ -25,11 +24,7 @@ namespace OMTB.Gameplay
 
     public class Damage
     {
-        public enum Type { Physical, Elemental, Pure }
-        public enum SubType { None, Crushing, Slashing, Piercing, Burning, Freezing, Shocking, Corrosion }
-
-        Type type;
-        SubType subType;
+        DamageType damageType;
 
         float total; // The total amount of delivered damage
         float perSecond; // How much damage per seconds?
@@ -41,8 +36,7 @@ namespace OMTB.Gameplay
      
         public Damage(DamageConfig config)
         {
-            type = config.Type;
-            subType = config.SubType;
+            damageType = config.damageType;
             total = config.Total;
             perSecond = config.PerSecond;
             duration = config.Duration;
@@ -54,31 +48,6 @@ namespace OMTB.Gameplay
 
         }
 
-        /**
-         * At least we need to validate type and subtype.
-         * */
-        void Validate(DamageConfig config)
-        {
-            
-            switch (config.Type)
-            {
-                case Damage.Type.Physical:
-                    if (!(config.SubType == Damage.SubType.Crushing || config.SubType == Damage.SubType.Slashing || config.SubType == Damage.SubType.Piercing))
-                        throw new System.Exception(string.Format("Physical damage must be Crushing, Slashing or Piercing."));
-                    break;
-                case Damage.Type.Elemental:
-                    if (!(config.SubType == Damage.SubType.Burning || config.SubType == Damage.SubType.Freezing || 
-                          config.SubType == Damage.SubType.Shocking || config.SubType == Damage.SubType.Corrosion))
-                        throw new System.Exception(string.Format("Elemental damage must be Burning, Freezing, Shocking or Corrosion."));
-                    break;
-                case Damage.Type.Pure:
-                    if (config.SubType != Damage.SubType.None)
-                        throw new System.Exception(string.Format("Pure damage is pure."));
-                    break;
-            }
-
-            
-        }
     }
 
 }
