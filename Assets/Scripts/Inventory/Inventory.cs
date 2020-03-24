@@ -123,6 +123,9 @@ namespace OMTB.Gameplay
             return ret;
         }
 
+        /**
+         * Returns the quantity of the store item. Works also for not root slots belonging to a big slot.
+         * */
         public int GetQuantity(int index)
         {
             ValidateIndex(index);
@@ -189,6 +192,43 @@ namespace OMTB.Gameplay
         }
 
         /**
+         * Returns true if the slot belongs to a big slot and the vector will store the relative coordinates inside the big slot itself, otherwise
+         * returns false. It works also for the big slot root.
+         * */
+        public bool TryGetCoordsInBigSlot(int index, out Vector2 coords)
+        {
+            ValidateIndex(index);
+
+            coords = Vector2.zero;
+
+            if (IsEmpty(index))
+                return false;
+
+            Item item = GetItem(index);
+
+            if (!item.HasBigSlot)
+                return false;
+
+            if (IsRoot(index))
+                return true;
+
+            int rootIndex = GetRootIndex(index);
+
+            int rootX = rootIndex % Inventory.Instance.Columns;
+            int thisX = index % Inventory.Instance.Columns;
+
+            coords.x = thisX - rootX;
+
+            int rootY = rootIndex / Inventory.Instance.Columns;
+            int thisY = index / Inventory.Instance.Columns;
+
+
+            coords.y = thisY - rootY;
+
+            return true;
+        }
+
+        /**
          * Returns true if the index refers to a slot beholding a multiple slot and fill the array with all the slots, otherwise returns false.
          * */
         public bool TryGetBigSlotIndices(int index, out int[] indices)
@@ -218,12 +258,12 @@ namespace OMTB.Gameplay
             indices = new int[(int)item.SlotShape.x*(int)item.SlotShape.y];
 
             // Loop through all the slots beolonging to the big slot and add them to the index array
-            for(int i=0; i<item.SlotShape.x; i++)
+            for(int i=0; i<item.SlotShape.y; i++)
             {
-                for(int j =0; j<item.SlotShape.y; j++)
+                for(int j =0; j<item.SlotShape.x; j++)
                 {
-                    indices[i * (int)item.SlotShape.y + j] = root + i * columns + j;
-                    Debug.Log(string.Format("Indices[{0}]: {1}", i * (int)item.SlotShape.y + j, root + i * columns + j));
+                    indices[i * (int)item.SlotShape.x + j] = root + i * columns + j;
+                    Debug.Log(string.Format("Indices[{0}]: {1}", i * (int)item.SlotShape.x + j, root + i * columns + j));
                 }
             }
 
@@ -466,16 +506,18 @@ namespace OMTB.Gameplay
             if (!IsEmpty(index) && GetItem(index) != item)
                 return 0;
 
+            if(!IsEmpty(index) && GetItem(index) == item)
+                index = GetRootIndex(index);
             
-            if (index/columns + item.SlotShape.x > rows || index % columns + item.SlotShape.y > columns ) // It doesn't fit
+            if (index/columns + item.SlotShape.y > rows || index % columns + item.SlotShape.x > columns ) // It doesn't fit
             {
                 return 0;
             }
 
             // If at least one of the slots matching the item slot shape contains a different item or refers to a root different from the index then return
-            for (int i=0; i<item.SlotShape.x; i++)
+            for (int i=0; i<item.SlotShape.y; i++)
             {
-                for(int j=0; j<item.SlotShape.y; j++)
+                for(int j=0; j<item.SlotShape.x; j++)
                 {
                     if (!IsEmpty(index + i*columns + j) && ( GetItem(index + i * columns + j) != item || roots[index + i * columns + j] != index ) )
                         return 0;
@@ -489,9 +531,9 @@ namespace OMTB.Gameplay
                 return 0;
 
             // Set root reference
-            for (int i = 0; i < item.SlotShape.x; i++)
+            for (int i = 0; i < item.SlotShape.y; i++)
             {
-                for (int j = 0; j < item.SlotShape.y; j++)
+                for (int j = 0; j < item.SlotShape.x; j++)
                 {
                     roots[index + i * columns + j] = index;
                     
@@ -613,7 +655,15 @@ namespace OMTB.Gameplay
 
         int InternalRemoveMulti(Item item, int quantity)
         {
-            return 0;
+            if (!Exists(item))
+                return 0;
+            int tmp = quantity;
+            for(int i=0; i<slots.Length && quantity > 0; i++)
+            {
+                quantity -= InternalRemoveMulti(i, quantity);
+            }
+
+            return tmp - quantity;
         }
         #endregion 
 

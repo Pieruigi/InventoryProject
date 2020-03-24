@@ -18,14 +18,14 @@ namespace OMTB.Collection
 
         public bool HasBigSlot { get; set; }
 
-        public Vector2 SlotShape { get; set; } = Vector2.one; // Rows x columns
+        public Vector2 SlotShape { get; set; } = Vector2.one; // Columns x rows
 
     }
 
     public abstract class Item : ScriptableObject
     {
         [SerializeField]
-        [ReadOnly]
+        //[ReadOnly]
         private string _name;
         public string Name
         {
@@ -62,11 +62,12 @@ namespace OMTB.Collection
         [SerializeField]
         //[ReadOnly]
         private Vector2 slotShape = Vector2.one;
-        public Vector2 SlotShape { get { return slotShape; } } // Rows x columns
+        public Vector2 SlotShape { get { return slotShape; } } // Columns x rows
 
         [SerializeField]
-        [ReadOnly]
+        //[ReadOnly]
         private Sprite icon; // The icon representing the item 
+        public Sprite Icon { get { return icon; } }
 
         [SerializeField]
         [ReadOnly]

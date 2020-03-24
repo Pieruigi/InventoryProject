@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c9242c7b23eec444a5eb5c6f37abb5c, type: 3}
   m_Name: 73e84b971b3b6b141855522590d89a78
   m_EditorClassIdentifier: 
-  _name: pippo
+  _name: potion
+  shortDesc: 
+  longDesc: 
   maxQuantity: 20
   maxQuantityPerSlot: 5
+  hasBigSlot: 0
+  slotShape: {x: 1, y: 1}
+  icon: {fileID: 21300000, guid: b1335470d755b4c44838875a32b108cf, type: 3}
+  asset: {fileID: 0}

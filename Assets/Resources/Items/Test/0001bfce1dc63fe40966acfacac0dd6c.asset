@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c9242c7b23eec444a5eb5c6f37abb5c, type: 3}
   m_Name: 0001bfce1dc63fe40966acfacac0dd6c
   m_EditorClassIdentifier: 
-  _name: pluto
+  _name: sword
   shortDesc: 
   longDesc: 
   maxQuantity: -1
   maxQuantityPerSlot: 20
   hasBigSlot: 1
-  slotShape: {x: 5, y: 3}
-  icon: {fileID: 0}
+  slotShape: {x: 2, y: 3}
+  icon: {fileID: 21300000, guid: e346e3ade85c17c4e9b4f8a2399582e4, type: 3}
   asset: {fileID: 0}

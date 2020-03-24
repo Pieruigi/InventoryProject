@@ -5,7 +5,7 @@ using System;
 
 namespace OMTB.Utility
 {
-    public class Math
+    public class MathUtil
     {
         
 

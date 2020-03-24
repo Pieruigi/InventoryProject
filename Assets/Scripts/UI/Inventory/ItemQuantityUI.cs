@@ -4,6 +4,7 @@ using UnityEngine;
 using OMTB.Interface;
 using UnityEngine.UI;
 using OMTB.Gameplay;
+using OMTB.Collection;
 
 namespace OMTB.UI
 {
@@ -43,14 +44,22 @@ namespace OMTB.UI
                 }
                 else
                 {
-                    if(Inventory.Instance.IsRoot(indexable.GetIndex()))
+                    // We show the quantity to the bottom right
+                    Item item = Inventory.Instance.GetItem(indexable.GetIndex());
+                    Vector2 coords;
+                    Inventory.Instance.TryGetCoordsInBigSlot(indexable.GetIndex(), out coords);
+
+                    if(coords.x == item.SlotShape.x-1 && coords.y == item.SlotShape.y - 1)
                         GetComponent<Text>().text = Inventory.Instance.GetQuantity(indexable.GetIndex()).ToString();
-                    else
-                        GetComponent<Text>().text = "";
+
+                    //if (Inventory.Instance.IsRoot(indexable.GetIndex()))
+                    //    GetComponent<Text>().text = Inventory.Instance.GetQuantity(indexable.GetIndex()).ToString();
+                    //else
+                    //    GetComponent<Text>().text = "";
                 }
             }
             else
-                GetComponent<Text>().text = "0";
+                GetComponent<Text>().text = "";
         }
     }
 
