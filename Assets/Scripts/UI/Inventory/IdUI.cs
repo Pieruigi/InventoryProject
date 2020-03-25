@@ -8,8 +8,6 @@ namespace OMTB.UI
 {
     public class IdUI : MonoBehaviour
     {
-        IIndexable slotUI;
-
         // Start is called before the first frame update
         void Start()
         {

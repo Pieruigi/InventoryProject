@@ -57,7 +57,9 @@ public class _InventoryTest : MonoBehaviour
 
         // Load all the resources
         items = new List<TestItem>( Resources.LoadAll<TestItem>("Items/Test"));
-        Debug.Log("Resources.Count:" + items.Count); 
+        Debug.Log("Resources.Count:" + items.Count);
+
+        
     }
 
     // Update is called once per frame

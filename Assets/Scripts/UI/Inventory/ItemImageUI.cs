@@ -6,21 +6,19 @@ using UnityEngine.UI;
 using OMTB.Gameplay;
 using OMTB.Collection;
 using OMTB.Utility;
+using UnityEngine.EventSystems;
 
 namespace OMTB.UI
 {
-    public class ItemImageUI : MonoBehaviour
+    public class ItemImageUI : MonoBehaviour//, IPointerEnterHandler, IPointerExitHandler
     {
-        IIndexable indexable;
-
         
-
         // Start is called before the first frame update
         void Start()
         {
-            Inventory.Instance.OnChanged += HandleInventoryOnChanged;
             
-            indexable = GetComponentInParent<IIndexable>();
+
+            Inventory.Instance.OnChanged += HandleInventoryOnChanged;
                         
             CheckInventory();
            
@@ -39,26 +37,28 @@ namespace OMTB.UI
 
         void CheckInventory()
         {
-            if (!Inventory.Instance.IsEmpty(indexable.GetIndex()))
+            int index = GetComponentInParent<IIndexable>().GetIndex();
+            Image image = GetComponent<Image>();
+            if (!Inventory.Instance.IsEmpty(index))
             {
-                GetComponent<Image>().enabled = true;
-                Item item = Inventory.Instance.GetItem(indexable.GetIndex());
+                image.enabled = true;
+                Item item = Inventory.Instance.GetItem(index);
                 if (!item.HasBigSlot)
                 {
-                    GetComponent<Image>().sprite = item.Icon;
+                    image.sprite = item.Icon;
                 }
                 else
                 {
-                    if (Inventory.Instance.IsRoot(indexable.GetIndex()))
+                    if (Inventory.Instance.IsRoot(index))
                     {
-                        GetComponent<Image>().sprite = SpriteUtil.GetSprite(item.Icon.texture, (int)item.SlotShape.x, (int)item.SlotShape.y, 0, 0);
+                        image.sprite = SpriteUtil.GetSprite(item.Icon.texture, (int)item.SlotShape.x, (int)item.SlotShape.y, 0, 0);
                     }
                     else
                     {
 
                         Vector2 coords;
-                        if (Inventory.Instance.TryGetCoordsInBigSlot(indexable.GetIndex(), out coords))
-                            GetComponent<Image>().sprite = SpriteUtil.GetSprite(item.Icon.texture, (int)item.SlotShape.x, (int)item.SlotShape.y, (int)coords.x, (int)coords.y);
+                        if (Inventory.Instance.TryGetCoordsInBigSlot(index, out coords))
+                            image.sprite = SpriteUtil.GetSprite(item.Icon.texture, (int)item.SlotShape.x, (int)item.SlotShape.y, (int)coords.x, (int)coords.y);
 
 
                     }
@@ -67,11 +67,23 @@ namespace OMTB.UI
             }
             else
             {
-                GetComponent<Image>().sprite = null;
-                GetComponent<Image>().enabled = false;
+                image.sprite = null;
+                image.enabled = false;
             }
                 
         }
+
+        //public void OnPointerEnter(PointerEventData eventData)
+        //{
+        //    //throw new System.NotImplementedException();
+        //    Debug.Log(string.Format("Enter: {0}", gameObject.name));
+        //}
+
+        //public void OnPointerExit(PointerEventData eventData)
+        //{
+
+        //    Debug.Log(string.Format("Exit: {0}", gameObject.name));
+        //}
     }
 
 }

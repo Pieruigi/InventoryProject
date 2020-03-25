@@ -90,6 +90,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dc0e4f9195ce124d8916497e1b37772, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  draggedItemPrefab: {fileID: 8140804201204686886, guid: e2d99350445e1364aa115ea36b1438a8,
+    type: 3}
 --- !u!1 &683256680863456410
 GameObject:
   m_ObjectHideFlags: 0

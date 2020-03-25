@@ -9,16 +9,12 @@ namespace OMTB.UI
 {
     public class ItemNameUI : MonoBehaviour
     {
-        IIndexable indexable;
-
         
 
         // Start is called before the first frame update
         void Start()
         {
             Inventory.Instance.OnChanged += HandleInventoryOnChanged;
-            
-            indexable = GetComponentInParent<IIndexable>();
                         
             CheckInventory();
            
@@ -37,9 +33,11 @@ namespace OMTB.UI
 
         void CheckInventory()
         {
-            if (!Inventory.Instance.IsEmpty(indexable.GetIndex()))
+            int index = GetComponentInParent<IIndexable>().GetIndex();
+
+            if (!Inventory.Instance.IsEmpty(index))
             {
-                GetComponent<Text>().text = Inventory.Instance.GetItem(indexable.GetIndex()).Name;
+                GetComponent<Text>().text = Inventory.Instance.GetItem(index).Name;
                 
             }
             else
