@@ -1,26 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using OMTB.Interface;
 using UnityEngine.UI;
 using OMTB.Gameplay;
 using OMTB.Collection;
 using OMTB.Utility;
-using UnityEngine.EventSystems;
 
 namespace OMTB.UI
 {
     public class ItemImageUI : MonoBehaviour//, IPointerEnterHandler, IPointerExitHandler
     {
-        
+
+        IIndexable indexable;
+
         // Start is called before the first frame update
         void Start()
         {
-            
+            indexable = GetComponentInParent<IIndexable>();
 
-            Inventory.Instance.OnChanged += HandleInventoryOnChanged;
+            indexable.GetContainer().SetOnChanged(HandleContainerOnChanged);
                         
-            CheckInventory();
+            CheckContainer();
            
         }
 
@@ -30,26 +29,43 @@ namespace OMTB.UI
 
         }
 
-        void HandleInventoryOnChanged()
+        private void OnDestroy()
         {
-            CheckInventory();
+            if(indexable != null)
+                indexable.GetContainer().UnsetOnChanged(HandleContainerOnChanged);
         }
 
-        void CheckInventory()
+        void HandleContainerOnChanged()
         {
-            int index = GetComponentInParent<IIndexable>().GetIndex();
+            CheckContainer();
+        }
+
+        void CheckContainer()
+        {
+            int index = indexable.GetIndex();
+
+            // Get the container
+            IItemContainer container = indexable.GetContainer() as IItemContainer;
+         
+            // Get the image component
             Image image = GetComponent<Image>();
-            if (!Inventory.Instance.IsEmpty(index))
+            
+            // If there an item at index then show its icon
+            if (!container.IsEmpty(index))
             {
                 image.enabled = true;
-                Item item = Inventory.Instance.GetItem(index);
+               
+                Item item = container.GetItem(index);
+
+                // If is not a big slot then show the icon as it is
                 if (!item.HasBigSlot)
                 {
                     image.sprite = item.Icon;
                 }
-                else
+                else // It's a big slot, lets do some puzzle
                 {
-                    if (Inventory.Instance.IsRoot(index))
+                    
+                    if(container.IsRoot(index))
                     {
                         image.sprite = SpriteUtil.GetSprite(item.Icon.texture, (int)item.SlotShape.x, (int)item.SlotShape.y, 0, 0);
                     }
@@ -57,7 +73,8 @@ namespace OMTB.UI
                     {
 
                         Vector2 coords;
-                        if (Inventory.Instance.TryGetCoordsInBigSlot(index, out coords))
+                        
+                        if (container.TryGetCoordsInBigSlot(index, out coords))
                             image.sprite = SpriteUtil.GetSprite(item.Icon.texture, (int)item.SlotShape.x, (int)item.SlotShape.y, (int)coords.x, (int)coords.y);
 
 
@@ -65,7 +82,7 @@ namespace OMTB.UI
                 }
                 
             }
-            else
+            else // No item has been found, hide icon
             {
                 image.sprite = null;
                 image.enabled = false;
@@ -73,17 +90,7 @@ namespace OMTB.UI
                 
         }
 
-        //public void OnPointerEnter(PointerEventData eventData)
-        //{
-        //    //throw new System.NotImplementedException();
-        //    Debug.Log(string.Format("Enter: {0}", gameObject.name));
-        //}
-
-        //public void OnPointerExit(PointerEventData eventData)
-        //{
-
-        //    Debug.Log(string.Format("Exit: {0}", gameObject.name));
-        //}
+  
     }
 
 }

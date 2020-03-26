@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using OMTB.Gameplay;
 using UnityEngine.UI;
+using OMTB.Interface;
 
 namespace OMTB.UI
 {
@@ -37,12 +38,8 @@ namespace OMTB.UI
             Init();
 
             Close();
-        }
 
-        // Update is called once per frame
-        void Update()
-        {
-            
+            //CounterSliderUI.Instance.Show(1, 10, (int a) => { Debug.Log("Counter:" + a); }, () => { Debug.Log("Cancel"); });
         }
 
 
@@ -80,6 +77,10 @@ namespace OMTB.UI
             {
                 GameObject slot = GameObject.Instantiate(slotPrefab, slotGroup);
                 slots[i] = slot;
+
+                // Set index and container
+                slot.GetComponent<IIndexable>().SetContainer(Inventory.Instance);
+                slot.GetComponent<IIndexable>().SetIndex(i);
             }
         }
         #endregion

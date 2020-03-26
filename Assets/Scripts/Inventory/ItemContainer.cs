@@ -7,8 +7,7 @@ using OMTB.Interface;
 
 namespace OMTB.Gameplay
 {
-#if OLD
-    public class InventoryConfig
+    public class ItemContainerConfig
     {
         
         public int Rows { get; set; }
@@ -16,7 +15,7 @@ namespace OMTB.Gameplay
         public int Columns { get; set; }
     }
   
-    public class Inventory: MonoBehaviour, IItemContainer
+    public abstract class ItemContainer: MonoBehaviour, IItemContainer
     {
         /**
          * Internal data to manage items
@@ -45,14 +44,15 @@ namespace OMTB.Gameplay
          * */
         public UnityAction OnChanged;
 
+        protected abstract ItemContainerConfig GetConfiguration();
 
-        public static Inventory Instance { get; private set; }
-        
+        //public static Inventory Instance { get; private set; }
+
         public int Rows { get { return rows; } }
         public int Columns { get { return columns; } }
 
 
-    #region PRIVATE
+        #region PRIVATE
    
         Slot[] slots; // The item list
         int rows, columns;
@@ -65,19 +65,15 @@ namespace OMTB.Gameplay
     
         int[] roots; // Used to manage multislots items; roots[i] = j means that slots[i] is null and belong to slots[j] which contains a big item
 
-    #endregion
+        #endregion
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-
-                InventoryConfig config = GetConfiguration();
-                Instance.rows = config.Rows;
-                Instance.columns = config.Columns;
-                Instance.slots = new Slot[rows*columns];
-                Instance.roots = new int[rows * columns];
+                ItemContainerConfig config = GetConfiguration();
+                rows = config.Rows;
+                columns = config.Columns;
+                slots = new Slot[rows*columns];
+                roots = new int[rows * columns];
                 // Init parents
                 for (int i = 0; i < roots.Length; i++)
                     roots[i] = -1;
@@ -88,13 +84,9 @@ namespace OMTB.Gameplay
                 // Set onSave handle
                 //CacheManager.SetHandleOnSave(HW.Constants.InventoryFileName, HandleCacheManagerOnSave);
 
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-                GameObject.Destroy(gameObject);
         }
 
-    #region GET
+        #region GET
         public void SetOnChanged(UnityAction handle)
         {
             OnChanged += handle;
@@ -150,6 +142,64 @@ namespace OMTB.Gameplay
             
             return slots[index].Quantity;
         }
+
+        /**
+         * Returns the amount of free room allowed for the given item in the give slot.
+         * */
+        public int GetFreeRoom(int index, Item item)
+        {
+            ValidateIndex(index);
+
+            ValidateItem(item);
+
+            int tot = GetQuantity(item); // The total quantity of the item in the inventory
+
+            if (!item.HasBigSlot)
+            {
+                return GetFreeRoom(index, item, tot);
+            }
+            else
+            {
+                int ret = 0;
+                for(int i=0; i<item.SlotShape.y; i++) // Rows
+                {
+                    for(int j=0; j < item.SlotShape.x; j++) // Columns
+                    {
+                        int idx = index + i * columns + j;
+                        Debug.Log("Checking:" + idx);
+                        ret = GetFreeRoom(idx, item, tot);
+                        if (ret <= 0)
+                            return 0;
+                    }
+                }
+
+                return ret;
+            }
+
+            //if (IsEmpty(index)) // The slot is empty
+            //{
+            //    Debug.Log(string.Format("IsEmpty:{0}", index));
+            //    q = item.MaxQuantityPerSlot;
+            //    Debug.Log(string.Format("q:{0}", q));
+            //}
+            //else // The slot is not empty
+            //{
+            //    if (GetItem(index) != item)// Different items
+            //        return 0;
+
+            //    q = item.MaxQuantityPerSlot - GetQuantity(index); // The maximum amount I can actually add in the slot
+            //}
+
+            //if (item.MaxQuantity < 0) // Infinite
+            //    return q;
+
+            //if (q > tot) // I can't add this quantity without exceeding the maximum amount
+            //    return item.MaxQuantity - tot;
+            //else
+            //    return q; // I fill the slot
+        }
+
+ 
 
         public bool IsEmpty(int index)
         {
@@ -241,7 +291,7 @@ namespace OMTB.Gameplay
         }
 
         /**
-         * Returns true if the index refers to a slot beholding a multiple slot and fill the array with all the slots, otherwise returns false.
+         * Returns true if the index refers to a slot belonging to a multiple slot and fill the array with all the slots, otherwise returns false.
          * */
         public bool TryGetBigSlotIndices(int index, out int[] indices)
         {
@@ -283,11 +333,65 @@ namespace OMTB.Gameplay
 
             return true;
         }
-       
-          
-    #endregion
 
-    #region ADD
+
+        #endregion
+
+        #region MOVE
+        /**
+         * Moves items from one slot to another and returns the actual move quantity
+         * */
+        public int Move(int srcIndex, int dstIndex, int quantity)
+        {
+            // Get the item
+            Item item = GetItem(srcIndex);
+
+            // Validate the item
+            ValidateItem(item);
+
+            
+            // Remove from source
+            int removed = Remove(srcIndex, quantity);
+
+            // Add to destination
+            int added = Insert(dstIndex, item, quantity);
+
+            // Add remaining items to source
+            if (removed > added)
+                Insert(srcIndex, item, removed - added);
+       
+            return added;
+        }
+
+        /**
+         * Moves items from a given slot to a slot into another container and returns the actual move quantity
+         * */
+        public int Move(int srcIndex, int dstIndex, IItemContainer dstContainer, int quantity)
+        {
+            if (dstContainer == null)
+                throw new Exception(string.Format("Destination container is null: {0}.", dstContainer));
+
+            // Get the item
+            Item item = GetItem(srcIndex);
+
+            // Validate the item
+            ValidateItem(item);
+
+            // Remove from source
+            int removed = Remove(srcIndex, quantity);
+
+            // Add to destination
+            int added = dstContainer.Insert(dstIndex, item, quantity);
+
+            // Add remaining items to source
+            if (removed > added)
+                Insert(srcIndex, item, removed - added);
+
+            return added;
+        }
+        #endregion
+
+        #region ADD
         /** TESTED
          * Adds an item given its quantity.
          * Returns the quantity added.
@@ -327,10 +431,10 @@ namespace OMTB.Gameplay
             return added;
         }
 
-    #endregion
+        #endregion
 
 
-    #region REMOVE
+        #region REMOVE
         /**
          * Removes a specific quantity of an item starting from the first slot.
          * */
@@ -369,12 +473,12 @@ namespace OMTB.Gameplay
         }
 
 
-    #endregion
+        #endregion
 
 
 
 
-    #region CACHING
+        #region CACHING
         /**
          * Aggiorna i dati in cache prima che questa venga salvata su file.
          * */
@@ -430,12 +534,37 @@ namespace OMTB.Gameplay
 
         //    }
         //}
-    #endregion
+        #endregion
 
-    #region INTERNAL
+        #region INTERNAL
+
+        private int GetFreeRoom(int index, Item item, int currentQuantity)
+        {
+            int q;
+            if (IsEmpty(index)) // The slot is empty
+            {
+                q = item.MaxQuantityPerSlot;
+            }
+            else // The slot is not empty
+            {
+                if (GetItem(index) != item)// Different items
+                    return 0;
+
+                q = item.MaxQuantityPerSlot - GetQuantity(index); // The maximum amount I can actually add in the slot
+            }
+
+            if (item.MaxQuantity < 0) // Infinite
+                return q;
+
+            if (q > currentQuantity) // I can't add this quantity without exceeding the maximum amount
+                return item.MaxQuantity - currentQuantity;
+            else
+                return q; // I fill the slot
+        }
 
         int InternalInsert(Item item, int quantity)
         {
+            Debug.Log("InternalInsert");
             // We can not exceed the maximum capacity for this item
             if (!item.IsInfiniteQuantity)
             {
@@ -457,6 +586,7 @@ namespace OMTB.Gameplay
 
         int InternalInsert(int index, Item item, int quantity)
         {
+            //Debug.Log("InternalInsert-index");
             // We can not exceed the maximum capacity for this item
             if (!item.IsInfiniteQuantity)
             {
@@ -468,6 +598,7 @@ namespace OMTB.Gameplay
             // Max quantity for this item has already been reached
             if (quantity == 0)
                 return 0;
+
 
             if (!item.HasBigSlot)
                 return InternalInsertSingle(index, item, quantity);
@@ -492,7 +623,7 @@ namespace OMTB.Gameplay
 
         int InternalInsertSingle(int index, Item item, int quantity)
         {
-            Debug.Log(string.Format("Single item add: {0}, index: {1}, quantity: {2}", item, index, quantity));
+            //Debug.Log(string.Format("Single item add: {0}, index: {1}, quantity: {2}", item, index, quantity));
 
             if (!IsEmpty(index) && GetItem(index) != item)
                 return 0;
@@ -514,7 +645,8 @@ namespace OMTB.Gameplay
          * */
         int InternalInsertMultiple(int index, Item item, int quantity)
         {
-            
+            //Debug.Log("InternalInsertMultiple");
+
             if (!IsEmpty(index) && GetItem(index) != item)
                 return 0;
 
@@ -684,9 +816,9 @@ namespace OMTB.Gameplay
 
             return tmp - quantity;
         }
-    #endregion
+        #endregion 
 
-    #region VALIDATE
+        #region VALIDATE
         void ValidateIndex(int index)
         {
             if (index < 0)
@@ -708,62 +840,16 @@ namespace OMTB.Gameplay
                 throw new Exception(string.Format("Quantity is less or equal to zero: {0}.", quantity));
         }
 
-    #endregion
-
-    #region CONFIGURATION
-        InventoryConfig GetConfiguration()
-        {
-            return new InventoryConfig() { Rows = 5, Columns = 8 };
-        }
-
-   
-    #endregion
-
-    }
-#endif
-    public class Inventory : ItemContainer
-    { 
-
-    public static Inventory Instance { get; private set; }
-
-        protected override void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-
-                //ItemContainerConfig config = GetConfiguration();
-                //Instance.rows = config.Rows;
-                //Instance.columns = config.Columns;
-                //Instance.slots = new Slot[rows * columns];
-                //Instance.roots = new int[rows * columns];
-                //// Init parents
-                //for (int i = 0; i < roots.Length; i++)
-                //    roots[i] = -1;
-
-                // Get data from chache
-                //TryLoadFromCache();
-
-                // Set onSave handle
-                //CacheManager.SetHandleOnSave(HW.Constants.InventoryFileName, HandleCacheManagerOnSave);
-
-                base.Awake();
-
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-                GameObject.Destroy(gameObject);
-        }
+        #endregion
 
         #region CONFIGURATION
-        protected override ItemContainerConfig GetConfiguration()
-        {
-            return new ItemContainerConfig() { Rows = 5, Columns = 8 };
-        }
+        //ItemContainerConfig GetConfiguration()
+        //{
+        //    return new ItemContainerConfig() { Rows = 5, Columns = 8 };
+        //}
 
-
+   
         #endregion
+
     }
-
-
 }

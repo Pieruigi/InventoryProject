@@ -6,13 +6,14 @@ namespace OMTB.Interface
 {
     public interface IIndexable
     {
-        int GetIndex();
+        int GetIndex(); // The index in the container
 
-        Item GetItem();
+        void SetIndex(int index);
 
-        bool IsEmpty();
+        IContainer GetContainer(); // The container 
 
-        int GetQuantity();
+        void SetContainer(IContainer container);
+
 
     }
 
