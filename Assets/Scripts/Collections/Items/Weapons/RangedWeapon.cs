@@ -41,7 +41,7 @@ namespace OMTB.Collection
         float reloadTime;
         public float ReloadTime { get { return reloadTime; } }
 
-        protected override void Init(ItemConfig config)
+        protected override void Init(Config config)
         {
             base.Init(config);
 

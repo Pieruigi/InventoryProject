@@ -56,7 +56,7 @@ public class _InventoryTest : MonoBehaviour
         btnCountByIndex.onClick.AddListener(HandleCountByIndexOnClick);
 
         // Load all the resources
-        items = new List<TestItem>( Resources.LoadAll<TestItem>("Items/Test"));
+        items = new List<TestItem>( Resources.LoadAll<TestItem>(OMTB.Configuration.ResourcesConfiguration.ItemsPath + "Test"));
         Debug.Log("Resources.Count:" + items.Count);
 
         

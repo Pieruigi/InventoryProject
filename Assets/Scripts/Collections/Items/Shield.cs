@@ -4,16 +4,19 @@ using UnityEngine;
 
 namespace OMTB.Collection
 {
-    public class TestItemConfig: ItemConfig
+    
+    public class ShieldConfig: Config
     {
-
+        
     }
 
-    public class TestItem : Item
+    public class Shield : Item
     {
+        
         protected override void Init(Config config)
         {
             base.Init(config);
+
         }
     }
 

@@ -9,7 +9,7 @@ namespace OMTB.UI
     public class CounterSliderUI : MonoBehaviour
     {
         [SerializeField]
-        Slider slider;
+        Button buttonDecrease, buttonIncrease;
 
         [SerializeField]
         Text labelMin, labelMax, labelSel;
@@ -17,6 +17,7 @@ namespace OMTB.UI
         [SerializeField]
         Button buttonAll, buttonSelected, buttonCancel;
 
+        int value, minValue, maxValue;
      
         public static CounterSliderUI Instance { get; private set; }
 
@@ -25,7 +26,20 @@ namespace OMTB.UI
             if (Instance == null)
             {
                 Instance = this;
-                Instance.slider.onValueChanged.AddListener(HandleOnValueChanged);
+                //Instance.slider.onValueChanged.AddListener(HandleOnValueChanged);
+                Instance.buttonDecrease.onClick.AddListener(() =>
+                {
+                    value--;
+                    if (value < minValue) value = minValue;
+                    labelSel.text = value.ToString();
+                });
+                Instance.buttonIncrease.onClick.AddListener(() =>
+                {
+                    value++;
+                    if (value > maxValue) value = maxValue;
+                    labelSel.text = value.ToString();
+                });
+
                 Instance.Hide(); 
             }
             else
@@ -55,9 +69,9 @@ namespace OMTB.UI
             labelMax.text = max.ToString();
             labelSel.text = min.ToString();
 
-            slider.maxValue = max;
-            slider.minValue = min;
-            slider.value = min;
+            maxValue = max;
+            minValue = min;
+            value = min;
             buttonAll.onClick.AddListener(() =>
             {
                 Confirm(max);
@@ -66,7 +80,7 @@ namespace OMTB.UI
 
             buttonSelected.onClick.AddListener(() =>
             {
-                Confirm((int)slider.value);
+                Confirm((int)value);
                 Hide();
             });
 
@@ -76,11 +90,6 @@ namespace OMTB.UI
                 Hide();
             });
 
-        }
-
-        void HandleOnValueChanged(float value)
-        {
-            labelSel.text = value.ToString();
         }
 
         private void Hide()

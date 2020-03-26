@@ -19,7 +19,7 @@ namespace OMTB.Collection
         float distance;
         public float Distance { get { return distance; } }
 
-        protected override void Init(ItemConfig config)
+        protected override void Init(Config config)
         {
             base.Init(config);
 

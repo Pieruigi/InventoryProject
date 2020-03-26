@@ -7,7 +7,7 @@ using System.ComponentModel;
 namespace OMTB.Collection
 {
 
-    public class ItemConfig
+    public class ItemConfig: Config
     {
         public string Name { get; set; }
         public string ShortDescription { get; set; }
@@ -22,7 +22,7 @@ namespace OMTB.Collection
 
     }
 
-    public abstract class Item : ScriptableObject
+    public abstract class Item : Asset
     {
         [SerializeField]
         //[ReadOnly]
@@ -74,28 +74,29 @@ namespace OMTB.Collection
         GameObject asset; // The prefab you are going to load into the scene
 
 
-        public static Item Create(System.Type type, ItemConfig config)
-        {
-            Item i = ScriptableObject.CreateInstance(type) as Item;
-            i.Init(config);
-            return i;
-        }
+        //public static Item Create(System.Type type, ItemConfig config)
+        //{
+        //    Item i = ScriptableObject.CreateInstance(type) as Item;
+        //    i.Init(config);
+        //    return i;
+        //}
                 
-        protected virtual void Init(ItemConfig config)
+        protected override void Init(Config config)
         {
             Debug.Log("Parent Init");
-            _name = config.Name;
-            maxQuantity = config.MaxQuantity;
+            ItemConfig c = config as ItemConfig;
+            _name = c.Name;
+            maxQuantity = c.MaxQuantity;
             if (maxQuantity == 0)
                 maxQuantity = -1;
-            maxQuantityPerSlot = config.MaxQuantityPerSlot;
+            maxQuantityPerSlot = c.MaxQuantityPerSlot;
             if (maxQuantityPerSlot == 0)
                 maxQuantityPerSlot = -1;
 
-            shortDesc = config.ShortDescription;
+            shortDesc = c.ShortDescription;
 
-            hasBigSlot = config.HasBigSlot;
-            slotShape = config.SlotShape;
+            hasBigSlot = c.HasBigSlot;
+            slotShape = c.SlotShape;
     
 
         }

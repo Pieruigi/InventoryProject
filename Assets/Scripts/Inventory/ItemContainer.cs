@@ -44,10 +44,11 @@ namespace OMTB.Gameplay
          * */
         public UnityAction OnChanged;
 
-        protected abstract ItemContainerConfig GetConfiguration();
+        //protected abstract ItemContainerConfig GetConfiguration();
 
         //public static Inventory Instance { get; private set; }
-
+        [SerializeField]
+        int columns, rows;
         public int Rows { get { return rows; } }
         public int Columns { get { return columns; } }
 
@@ -55,7 +56,7 @@ namespace OMTB.Gameplay
         #region PRIVATE
    
         Slot[] slots; // The item list
-        int rows, columns;
+        
 
         /**
          * This is form multislots items support. 
@@ -69,9 +70,9 @@ namespace OMTB.Gameplay
 
         protected virtual void Awake()
         {
-                ItemContainerConfig config = GetConfiguration();
-                rows = config.Rows;
-                columns = config.Columns;
+                //ItemContainerConfig config = GetConfiguration();
+                //rows = config.Rows;
+                //columns = config.Columns;
                 slots = new Slot[rows*columns];
                 roots = new int[rows * columns];
                 // Init parents
@@ -840,15 +841,6 @@ namespace OMTB.Gameplay
                 throw new Exception(string.Format("Quantity is less or equal to zero: {0}.", quantity));
         }
 
-        #endregion
-
-        #region CONFIGURATION
-        //ItemContainerConfig GetConfiguration()
-        //{
-        //    return new ItemContainerConfig() { Rows = 5, Columns = 8 };
-        //}
-
-   
         #endregion
 
     }

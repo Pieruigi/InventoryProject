@@ -5,42 +5,121 @@ using OMTB.Collection;
 
 namespace OMTB.Editor
 {
+
+
     public class ItemBuilderWindow : EditorWindow
     {
-        string path = "Test";
+        static Vector2 winSize = new Vector2(800, 600);
+
         string basePath = "Assets/Resources/Items/";
 
-        string shortDesc;
+        string weaponName;
+
+        int weaponGrip = 0;
+        string[] weaponGrips = new string[] { WeaponGrip.None.ToString(), WeaponGrip.OneHand.ToString(), WeaponGrip.TwoHands.ToString() };
+
+        string armorName;
+
+        int bodyPartSelected = 0;
+
+        string[] bodyParts = new string[]
+        {
+                ArmorBodyPart.Head.ToString(),
+                ArmorBodyPart.Chest.ToString(),
+                ArmorBodyPart.Gloves.ToString(),
+                ArmorBodyPart.Pants.ToString(),
+                ArmorBodyPart.Boots.ToString()
+        };
 
         [MenuItem("Window/InventoryAsset")]
         public static void ShowWindow()
         {
-            EditorWindow.GetWindow<ItemBuilderWindow>("Item Builder");
+            Vector2 size = Vector2.one * 800;
+            EditorWindow.GetWindow<ItemBuilderWindow>().maxSize = winSize;
+            EditorWindow.GetWindow<ItemBuilderWindow>().minSize = winSize;
+            EditorWindow.GetWindow<ItemBuilderWindow>().maximized = true;
+            EditorWindow.GetWindow<ItemBuilderWindow>("Items Builder");
         }
 
         
         private void OnGUI()
         {
-            path = EditorGUILayout.TextField(basePath, path);
+            float width = winSize.x;
+            float height = winSize.y / 4;
+            GUI.BeginGroup(new Rect(0f , 0f , width, height));
+            ShowBox();
+            CreateWeapon();
+            
 
-            shortDesc = EditorGUILayout.TextField("Short Description", shortDesc);
+            GUI.EndGroup();
+
+            GUI.BeginGroup(new Rect(0f, 20f, width, height));
+            ShowBox();
+            
+            CreateArmor();
+
+            GUI.EndGroup();
+        }
+
+        void ShowBox()
+        {
+            
+        }
+
+        void CreateWeapon()
+        {
+            
+            weaponName = EditorGUILayout.TextField("Weapon Name", weaponName);
+            weaponGrip = EditorGUILayout.Popup(weaponGrip, weaponGrips);
+            if (GUILayout.Button("Create!"))
+            {
+
+                if (weaponName == null || "".Equals(weaponName))
+                {
+                    EditorUtility.DisplayDialog("Error!", "Specify a name for this weapon", "OK");
+                    return;
+                }
+
+
+
+                Asset item = AssetBuilder.Build(OMTB.Configuration.ResourcesConfiguration.WeaponsPath, typeof(MeleeWeapon), 
+                    new MeleeWeaponConfig()
+                    {
+                        Name = weaponName,
+                        Grip = (WeaponGrip)weaponGrip,
+                        MaxQuantityPerSlot = 5,
+                        HasBigSlot = false
+                    });
+
+
+
+            }
+        }
+
+        void CreateArmor()
+        {
+            //path = EditorGUILayout.TextField(basePath, path);
+
+            armorName = EditorGUILayout.TextField("Armor Name", armorName);
+
+            bodyPartSelected = EditorGUILayout.Popup(bodyPartSelected, bodyParts);
 
             if (GUILayout.Button("Create!"))
             {
 
-                if(shortDesc == null || "".Equals(shortDesc))
+                if (armorName == null || "".Equals(armorName))
                 {
-                    EditorUtility.DisplayDialog("Error!", "Specify a short description", "OK");
+                    EditorUtility.DisplayDialog("Error!", "Specify a name for this piece of armor", "OK");
                     return;
                 }
 
-                Item item = ItemBuilder.Build(basePath + path, typeof(TestItem), new TestItemConfig()
-                {
-                    Name = shortDesc,
-                    MaxQuantityPerSlot = 20,
-                    HasBigSlot = false
-                });
-
+                Asset item = AssetBuilder.Build(OMTB.Configuration.ResourcesConfiguration.ArmorsPath, typeof(Armor),
+                    new ArmorConfig()
+                    {
+                        Name = armorName,
+                        BodyPart = (ArmorBodyPart)bodyPartSelected
+                    });
+                    
 
 
             }
