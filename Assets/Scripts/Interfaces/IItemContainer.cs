@@ -7,7 +7,7 @@ using OMTB.Collection;
 namespace OMTB.Interface
 {
     
-    public interface IItemContainer: IContainer
+    public interface IItemContainer: IContainer<Item>
     {
         //void SetOnChanged(UnityAction handle);
 

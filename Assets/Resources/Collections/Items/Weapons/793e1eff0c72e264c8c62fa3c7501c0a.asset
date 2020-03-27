@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: 793e1eff0c72e264c8c62fa3c7501c0a
   m_EditorClassIdentifier: 
   _name: Sword
+  category: {fileID: 11400000, guid: 9ce710e030775584b92142abcd48be2c, type: 2}
   shortDesc: 
   longDesc: 
   maxQuantity: -1
   maxQuantityPerSlot: 5
   hasBigSlot: 1
   slotShape: {x: 1, y: 3}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: e346e3ade85c17c4e9b4f8a2399582e4, type: 3}
   asset: {fileID: 0}
+  grip: 0

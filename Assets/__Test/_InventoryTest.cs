@@ -10,6 +10,12 @@ using OMTB.Collection;
 public class _InventoryTest : MonoBehaviour
 {
     [SerializeField]
+    InventoryUI inventoryUI;
+
+    [SerializeField]
+    InventoryUI weaponLeftHandUI;
+
+    [SerializeField]
     InputField singleAddName;
 
     [SerializeField]
@@ -67,10 +73,17 @@ public class _InventoryTest : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            if (InventoryUI.Instance.IsOpened)
-                InventoryUI.Instance.Close();
+            if (inventoryUI.IsOpened)
+            {
+                inventoryUI.Close();
+                weaponLeftHandUI.Close();
+            }
             else
-                InventoryUI.Instance.Open();
+            {
+                inventoryUI.Open();
+                weaponLeftHandUI.Open();
+            }
+                
         }
     }
 

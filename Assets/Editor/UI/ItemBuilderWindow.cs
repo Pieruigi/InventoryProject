@@ -26,10 +26,13 @@ namespace OMTB.Editor
         {
                 ArmorBodyPart.Head.ToString(),
                 ArmorBodyPart.Chest.ToString(),
-                ArmorBodyPart.Gloves.ToString(),
-                ArmorBodyPart.Pants.ToString(),
-                ArmorBodyPart.Boots.ToString()
+                ArmorBodyPart.Hands.ToString(),
+                ArmorBodyPart.Legs.ToString(),
+                ArmorBodyPart.Feet.ToString()
         };
+
+
+        string categoryName;
 
         [MenuItem("Window/InventoryAsset")]
         public static void ShowWindow()
@@ -45,7 +48,7 @@ namespace OMTB.Editor
         private void OnGUI()
         {
             float width = winSize.x;
-            float height = winSize.y / 4;
+            float height = winSize.y;
             GUI.BeginGroup(new Rect(0f , 0f , width, height));
             ShowBox();
             CreateWeapon();
@@ -57,6 +60,13 @@ namespace OMTB.Editor
             ShowBox();
             
             CreateArmor();
+
+            GUI.EndGroup();
+
+            GUI.BeginGroup(new Rect(0f, 40f, width, height));
+            ShowBox();
+
+            CreateCategory();
 
             GUI.EndGroup();
         }
@@ -125,7 +135,28 @@ namespace OMTB.Editor
             }
         }
 
-        
+        void CreateCategory()
+        {
+            //path = EditorGUILayout.TextField(basePath, path);
+
+            categoryName = EditorGUILayout.TextField("Category Name", categoryName);
+
+            if (GUILayout.Button("Create!"))
+            {
+
+                if (categoryName == null || "".Equals(categoryName))
+                {
+                    EditorUtility.DisplayDialog("Error!", "Specify a name for this category", "OK");
+                    return;
+                }
+
+                Asset item = AssetBuilder.Build(OMTB.Configuration.ResourcesConfiguration.CategoriesPath, categoryName, typeof(Category), new Config());
+
+
+
+            }
+        }
+
     }
 
 }

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: 267b528f457ecd844bd345fd44ae5a75
   m_EditorClassIdentifier: 
   _name: Heavy gloves
+  category: {fileID: 11400000, guid: 99bd666d85358d646974c5ad7fa6777c, type: 2}
   shortDesc: 
   longDesc: 
   maxQuantity: -1
@@ -21,3 +22,4 @@ MonoBehaviour:
   slotShape: {x: 1, y: 1}
   icon: {fileID: 0}
   asset: {fileID: 0}
+  bodyPart: 1

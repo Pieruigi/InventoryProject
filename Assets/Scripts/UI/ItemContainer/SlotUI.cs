@@ -10,7 +10,7 @@ namespace OMTB.UI
     /**
      * You can use this class to represent slots in a lot of places, such as the inventory, the crafting system, the equipment.
      * */
-    public class SlotUI : MonoBehaviour, IIndexable, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler,
+    public class SlotUI : MonoBehaviour, IIndexable<Item>, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler,
                           IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         /**
@@ -65,12 +65,12 @@ namespace OMTB.UI
             this.index = index;
         }
 
-        public virtual IContainer GetContainer()
+        public virtual IContainer<Item> GetContainer()
         {
             return container;
         }
 
-        public virtual void SetContainer(IContainer container)
+        public virtual void SetContainer(IContainer<Item> container)
         {
             this.container = container as IItemContainer;
         }
@@ -127,15 +127,17 @@ namespace OMTB.UI
             if (eventData.button == PointerEventData.InputButton.Left)
             {
                 // Create the left receiver drag
-                receiver = GameObject.Instantiate(leftReceiverPrefab, transform.root, false);
+                if(leftReceiverPrefab)
+                    receiver = GameObject.Instantiate(leftReceiverPrefab, transform.root, false);
             }
             else if (eventData.button == PointerEventData.InputButton.Left)
             {
                 // Create the icon image we are going to drag aroung
-                receiver = GameObject.Instantiate(rightReceiverPrefab, transform.root, false);
+                if(rightReceiverPrefab)
+                    receiver = GameObject.Instantiate(rightReceiverPrefab, transform.root, false);
             }
-
-            receiver.GetComponent<IPointerReceiver>().StartDragging(gameObject, currentRaycast);
+            if(receiver)
+                receiver.GetComponent<IPointerReceiver>().StartDragging(gameObject, currentRaycast);
         }
 
         void HandleOnEndDrag(PointerEventData eventData, GameObject currentRaycast)

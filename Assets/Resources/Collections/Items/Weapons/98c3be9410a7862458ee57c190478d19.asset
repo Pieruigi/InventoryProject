@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: 98c3be9410a7862458ee57c190478d19
   m_EditorClassIdentifier: 
   _name: Pike
+  category: {fileID: 11400000, guid: 9ce710e030775584b92142abcd48be2c, type: 2}
   shortDesc: 
   longDesc: 
   maxQuantity: -1

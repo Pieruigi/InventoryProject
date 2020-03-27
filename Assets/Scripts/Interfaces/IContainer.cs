@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace OMTB.Interface
 {
-    public interface IContainer 
+    public interface IContainer<T> 
     {
         void SetOnChanged(UnityAction handle);
 

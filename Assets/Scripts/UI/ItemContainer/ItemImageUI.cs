@@ -10,12 +10,12 @@ namespace OMTB.UI
     public class ItemImageUI : MonoBehaviour//, IPointerEnterHandler, IPointerExitHandler
     {
 
-        IIndexable indexable;
+        IIndexable<Item> indexable;
 
         // Start is called before the first frame update
         void Start()
         {
-            indexable = GetComponentInParent<IIndexable>();
+            indexable = GetComponentInParent<IIndexable<Item>>();
 
             indexable.GetContainer().SetOnChanged(HandleContainerOnChanged);
                         

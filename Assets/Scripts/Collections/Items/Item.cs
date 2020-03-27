@@ -10,6 +10,9 @@ namespace OMTB.Collection
     public class ItemConfig: Config
     {
         public string Name { get; set; }
+       
+        public Category Category { get; set; }
+
         public string ShortDescription { get; set; }
        
         public int MaxQuantity { get; set; } = -1;
@@ -27,10 +30,13 @@ namespace OMTB.Collection
         [SerializeField]
         //[ReadOnly]
         private string _name;
-        public string Name
-        {
-            get { return _name; }
-        }
+        public string Name { get { return _name; } }
+
+        [SerializeField]
+        //[ReadOnly]
+        Category category; // Used as filter; can be null.
+        public Category Category { get { return Category; } }
+        
 
         [SerializeField]
         [ReadOnly]

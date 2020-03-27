@@ -49,6 +49,7 @@ namespace OMTB.Gameplay
         //public static Inventory Instance { get; private set; }
         [SerializeField]
         int columns, rows;
+
         public int Rows { get { return rows; } }
         public int Columns { get { return columns; } }
 
@@ -87,7 +88,6 @@ namespace OMTB.Gameplay
 
         }
 
-        #region GET
         public void SetOnChanged(UnityAction handle)
         {
             OnChanged += handle;
@@ -98,6 +98,7 @@ namespace OMTB.Gameplay
             OnChanged -= handle;
         }
 
+        #region GET
         /**
          * Returns true if there is at least a slot containig the given item
         * */
@@ -145,9 +146,9 @@ namespace OMTB.Gameplay
         }
 
         /**
-         * Returns the amount of free room allowed for the given item in the give slot.
+         * Returns the amount of free room allowed for the given item in the given slot.
          * */
-        public int GetFreeRoom(int index, Item item)
+        public virtual int GetFreeRoom(int index, Item item)
         {
             ValidateIndex(index);
 
@@ -162,7 +163,30 @@ namespace OMTB.Gameplay
             else
             {
                 int ret = 0;
-                for(int i=0; i<item.SlotShape.y; i++) // Rows
+                if (!IsRoot(index)) // It's not the root
+                {
+                    int tmp = GetRootIndex(index);
+                    if(tmp >= 0) // Find the root
+                    {
+                        index = GetRootIndex(index);
+                    }
+                    else // It's empty
+                    {
+                        // If it doesn' fit then move back
+                        index = FitBorders(index, item);
+
+                        //int y = index / columns + (int)item.SlotShape.y - rows;
+                        //int x = index % columns + (int)item.SlotShape.x - columns;
+                        //if (x > 0 || y > 0) // It doesn't fit
+                        //{
+                        //    // Try move back
+                        //    if (y > 0) index -= y * columns;
+                        //    if (x > 0) index -= x;
+                        //}
+                    }
+                }
+
+                for (int i=0; i<item.SlotShape.y; i++) // Rows
                 {
                     for(int j=0; j < item.SlotShape.x; j++) // Columns
                     {
@@ -176,28 +200,7 @@ namespace OMTB.Gameplay
 
                 return ret;
             }
-
-            //if (IsEmpty(index)) // The slot is empty
-            //{
-            //    Debug.Log(string.Format("IsEmpty:{0}", index));
-            //    q = item.MaxQuantityPerSlot;
-            //    Debug.Log(string.Format("q:{0}", q));
-            //}
-            //else // The slot is not empty
-            //{
-            //    if (GetItem(index) != item)// Different items
-            //        return 0;
-
-            //    q = item.MaxQuantityPerSlot - GetQuantity(index); // The maximum amount I can actually add in the slot
-            //}
-
-            //if (item.MaxQuantity < 0) // Infinite
-            //    return q;
-
-            //if (q > tot) // I can't add this quantity without exceeding the maximum amount
-            //    return item.MaxQuantity - tot;
-            //else
-            //    return q; // I fill the slot
+              
         }
 
  
@@ -277,13 +280,13 @@ namespace OMTB.Gameplay
 
             int rootIndex = GetRootIndex(index);
 
-            int rootX = rootIndex % Inventory.Instance.Columns;
-            int thisX = index % Inventory.Instance.Columns;
+            int rootX = rootIndex % columns;
+            int thisX = index % columns;
 
             coords.x = thisX - rootX;
 
-            int rootY = rootIndex / Inventory.Instance.Columns;
-            int thisY = index / Inventory.Instance.Columns;
+            int rootY = rootIndex / columns;
+            int thisY = index / columns;
 
 
             coords.y = thisY - rootY;
@@ -544,6 +547,7 @@ namespace OMTB.Gameplay
             int q;
             if (IsEmpty(index)) // The slot is empty
             {
+                Debug.Log("The slot is empty:"+index);
                 q = item.MaxQuantityPerSlot;
             }
             else // The slot is not empty
@@ -646,6 +650,7 @@ namespace OMTB.Gameplay
          * */
         int InternalInsertMultiple(int index, Item item, int quantity)
         {
+            index = FitBorders(index, item);
             //Debug.Log("InternalInsertMultiple");
 
             if (!IsEmpty(index) && GetItem(index) != item)
@@ -654,17 +659,28 @@ namespace OMTB.Gameplay
             if(!IsEmpty(index) && GetItem(index) == item)
                 index = GetRootIndex(index);
 
-            int y = index / columns + (int)item.SlotShape.y - rows;
-            int x = index % columns + (int)item.SlotShape.x - columns;
-            if ( x > 0 || y > 0) // It doesn't fit
-            {
-                // Try move back
-                if (y > 0) index -= y * columns;
-                if (x > 0) index -= x;
+            //int y = index / columns + (int)item.SlotShape.y - rows;
+            //int x = index % columns + (int)item.SlotShape.x - columns;
+            //if ( x > 0 || y > 0) // It doesn't fit
+            //{
+            //    // Try move back
+            //    if (y > 0) index -= y * columns;
+            //    if (x > 0) index -= x;
 
-                // Retry 
-                return InternalInsertMultiple(index, item, quantity);
-            }
+            //    // Retry 
+            //    return InternalInsertMultiple(index, item, quantity);
+            //}
+
+            //if((index = FitBorders(index, item)) != index)
+            //{
+            //    Debug.Log("FittingBorders BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+            //    return InternalInsertMultiple(index, item, quantity);
+            //}
+
+            //int tmp = index;
+            //index = FitBorders(index, item);
+            //if(tmp != index)
+            //    return InternalInsertMultiple(index, item, quantity);
 
             // If at least one of the slots matching the item slot shape contains a different item or refers to a root different from the index then return
             for (int i=0; i<item.SlotShape.y; i++)
@@ -817,6 +833,22 @@ namespace OMTB.Gameplay
 
             return tmp - quantity;
         }
+
+        int FitBorders(int index, Item item)
+        {
+            int y = index / columns + (int)item.SlotShape.y - rows;
+            int x = index % columns + (int)item.SlotShape.x - columns;
+            if (x > 0 || y > 0) // It doesn't fit
+            {
+                // Try move back
+                if (y > 0) index -= y * columns;
+                if (x > 0) index -= x;
+            }
+
+            return index;
+        }
+
+        
         #endregion 
 
         #region VALIDATE
@@ -840,6 +872,7 @@ namespace OMTB.Gameplay
             if (quantity <= 0)
                 throw new Exception(string.Format("Quantity is less or equal to zero: {0}.", quantity));
         }
+
 
         #endregion
 

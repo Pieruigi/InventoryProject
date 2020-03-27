@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: 7fe3e8c2d515c254b88a9628cc2bb0cb
   m_EditorClassIdentifier: 
   _name: Magic boots
+  category: {fileID: 11400000, guid: 99bd666d85358d646974c5ad7fa6777c, type: 2}
   shortDesc: 
   longDesc: 
   maxQuantity: -1
@@ -21,3 +22,4 @@ MonoBehaviour:
   slotShape: {x: 1, y: 1}
   icon: {fileID: 0}
   asset: {fileID: 0}
+  bodyPart: 1

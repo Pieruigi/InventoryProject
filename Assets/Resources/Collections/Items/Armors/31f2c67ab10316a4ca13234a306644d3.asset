@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: 31f2c67ab10316a4ca13234a306644d3
   m_EditorClassIdentifier: 
   _name: Short pants
+  category: {fileID: 11400000, guid: 99bd666d85358d646974c5ad7fa6777c, type: 2}
   shortDesc: 
   longDesc: 
   maxQuantity: -1
@@ -21,3 +22,4 @@ MonoBehaviour:
   slotShape: {x: 1, y: 1}
   icon: {fileID: 0}
   asset: {fileID: 0}
+  bodyPart: 1

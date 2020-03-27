@@ -11,12 +11,12 @@ namespace OMTB.UI
     
     public class ItemQuantityUI : MonoBehaviour
     {
-        IIndexable indexable;
+        IIndexable<Item> indexable;
 
         // Start is called before the first frame update
         void Start()
         {
-            indexable = GetComponentInParent<IIndexable>();
+            indexable = GetComponentInParent<IIndexable<Item>>();
 
             indexable.GetContainer().SetOnChanged(HandleContainerOnChanged);
         

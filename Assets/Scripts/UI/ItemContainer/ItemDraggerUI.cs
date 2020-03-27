@@ -20,7 +20,7 @@ namespace OMTB.UI
 
         float scaleTime = 0.05f;
 
-        IIndexable source;
+        IIndexable<Item> source;
 
         
 
@@ -55,7 +55,7 @@ namespace OMTB.UI
         public void StartDragging(GameObject sender, GameObject currentRaycast)
         {
             // Store the source
-            source = sender.GetComponent<IIndexable>();
+            source = sender.GetComponent<IIndexable<Item>>();
             
             // Get the image component
             Image image = GetComponent<Image>();
@@ -78,7 +78,7 @@ namespace OMTB.UI
             }
 
             // Try move to another slot
-            IIndexable dest = currentRaycast.GetComponent<IIndexable>();
+            IIndexable<Item> dest = currentRaycast.GetComponent<IIndexable<Item>>();
             
             if (dest != null)
             {
@@ -97,28 +97,56 @@ namespace OMTB.UI
                 
                 if (Input.GetKey(KeyCode.LeftControl))
                 {
+                    int srcQ = srcContainer.GetQuantity(srcIdx);
                     bool open = true;
+                    
                     int q = dstContainer.GetFreeRoom(dstIdx, item);
+
+                    // If there is no room or I'm not moving the item at all then do nothing
                     if ((q <= 0) || ((dstContainer == srcContainer) && (dstIdx == srcIdx || srcContainer.GetRootIndex(srcIdx) == srcContainer.GetRootIndex(dstIdx))))
                         open = false;
                     
+                    // If there is free room but only for a single object you don't need to open the quantity selector panel, then simply add the object ( this
+                    // works well for the equipment for example )
+                    if(q==1 || srcQ == 1)
+                    {
+                        open = false;
+                    }
+
                     Debug.Log(string.Format("q:{0}", q));
                     if (open)
                     {
-                        CounterSliderUI.Instance.Show(1, srcContainer.GetQuantity(srcIdx), (int a) =>
+                        if(q > 1 && srcQ > 1)
                         {
-                            // Move items
-                            srcContainer.Move(srcIdx, dstIdx, dstContainer, a);
+                            int max = Mathf.Min(q, srcQ);
 
-                        }, () => { });
+                            CounterSliderUI.Instance.Show(1, max /*srcContainer.GetQuantity(srcIdx)*/, (int a) =>
+                            {
+                                // Move items
+                                srcContainer.Move(srcIdx, dstIdx, dstContainer, a);
+
+                            }, () => { });
+                        }
+                       
+                        
                     }
-                    
+                    else
+                    {
+                        if (q == 1 || srcQ >= 1)
+                            srcContainer.Move(srcIdx, dstIdx, dstContainer, 1);
+                    }
+
                 }
                 else
                 {
-                    quantity = 1;
-                    // Move items
-                    srcContainer.Move(srcIdx, dstIdx, dstContainer, quantity);
+                    if(dstContainer.GetFreeRoom(dstIdx, item) > 0)
+                    {
+                        quantity = 1;
+                        // Move items
+                        srcContainer.Move(srcIdx, dstIdx, dstContainer, quantity);
+                    }
+                    
+                    
                 }
 
                 

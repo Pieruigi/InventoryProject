@@ -4,18 +4,19 @@ using UnityEngine;
 using OMTB.Interface;
 using UnityEngine.UI;
 using OMTB.Gameplay;
+using OMTB.Collection;
 
 namespace OMTB.UI
 {
     public class ItemNameUI : MonoBehaviour
     {
 
-        IIndexable indexable;
+        IIndexable<Item> indexable;
 
         // Start is called before the first frame update
         void Start()
         {
-            indexable = GetComponentInParent<IIndexable>();
+            indexable = GetComponentInParent<IIndexable<Item>>();
 
             indexable.GetContainer().SetOnChanged(HandleContainerOnChanged);
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using OMTB.Gameplay;
 using UnityEngine.UI;
 using OMTB.Interface;
+using OMTB.Collection;
 
 namespace OMTB.UI
 {
@@ -15,20 +16,25 @@ namespace OMTB.UI
         [SerializeField]
         Transform slotGroup;
 
+        [SerializeField]
+        ItemContainer container;
+
         GameObject[] slots;
 
         GameObject panel;
 
         public bool IsOpened { get { return panel.activeSelf; } }
 
-        public static InventoryUI Instance { get; private set; }
+        //public static InventoryUI Instance { get; private set; }
+
+        
 
         private void Awake()
         {
-            if (Instance == null)
-                Instance = this;
-            else
-                Destroy(gameObject);
+            //if (Instance == null)
+            //    Instance = this;
+            //else
+            //    Destroy(gameObject);
         }
 
         // Start is called before the first frame update
@@ -60,8 +66,8 @@ namespace OMTB.UI
             panel = transform.GetChild(0).gameObject;
 
             // Get inventory properties
-            int rows = Inventory.Instance.Rows;
-            int columns = Inventory.Instance.Columns;
+            int rows = container.Rows;
+            int columns = container.Columns;
             int tot = rows * columns;
 
             // Init array to store all the slots we are going to add
@@ -79,8 +85,8 @@ namespace OMTB.UI
                 slots[i] = slot;
 
                 // Set index and container
-                slot.GetComponent<IIndexable>().SetContainer(Inventory.Instance);
-                slot.GetComponent<IIndexable>().SetIndex(i);
+                slot.GetComponent<IIndexable<Item>>().SetContainer(container);
+                slot.GetComponent<IIndexable<Item>>().SetIndex(i);
             }
         }
         #endregion

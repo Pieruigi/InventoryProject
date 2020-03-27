@@ -11,6 +11,7 @@ namespace OMTB.Configuration
         public static readonly string ItemsPath = BasePath + "Items/";
         public static readonly string WeaponsPath = ItemsPath + "Weapons/";
         public static readonly string ArmorsPath = ItemsPath + "Armors/";
+        public static readonly string CategoriesPath = BasePath + "Categories/";
         #endregion
     }
 

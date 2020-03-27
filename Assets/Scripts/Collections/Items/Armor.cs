@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OMTB.Collection
 {
-    public enum ArmorBodyPart { Head, Chest, Gloves, Pants, Boots }
+    public enum ArmorBodyPart { Head, Chest, Hands, Legs, Feet}
 
     public class ArmorConfig: ItemConfig
     {
@@ -16,6 +16,7 @@ namespace OMTB.Collection
         [SerializeField]
         [ReadOnly]
         ArmorBodyPart bodyPart = ArmorBodyPart.Chest;
+        public ArmorBodyPart BodyPart { get { return bodyPart; } }
 
         protected override void Init(Config config)
         {

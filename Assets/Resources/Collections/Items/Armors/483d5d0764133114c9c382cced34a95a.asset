@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b09e78dc9c066bb47a3248f1a4b6a635, type: 3}
   m_Name: 483d5d0764133114c9c382cced34a95a
   m_EditorClassIdentifier: 
-  _name: Armor
+  _name: Chest Armor
+  category: {fileID: 11400000, guid: 99bd666d85358d646974c5ad7fa6777c, type: 2}
   shortDesc: 
   longDesc: 
   maxQuantity: -1
@@ -21,3 +22,4 @@ MonoBehaviour:
   slotShape: {x: 1, y: 1}
   icon: {fileID: 0}
   asset: {fileID: 0}
+  bodyPart: 1
