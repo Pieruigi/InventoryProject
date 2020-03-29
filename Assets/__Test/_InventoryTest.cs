@@ -130,7 +130,7 @@ public class _InventoryTest : MonoBehaviour
     void HandleGetByIndexOnClick()
     {
         SetData();
-        Item i = Inventory.Instance.GetItem(slot);
+        Item i = Inventory.Instance.GetElement(slot);
         txtGetResult.text = i.Name;
     }
 

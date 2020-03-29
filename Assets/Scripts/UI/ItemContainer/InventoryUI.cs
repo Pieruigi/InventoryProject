@@ -17,7 +17,7 @@ namespace OMTB.UI
         Transform slotGroup;
 
         [SerializeField]
-        ItemContainer container;
+        Inventory container;
 
         GameObject[] slots;
 

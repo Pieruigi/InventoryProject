@@ -9,7 +9,7 @@ namespace OMTB.Gameplay
 {
     public enum Hand { Left, Right }
 
-    public class WeaponEquipment : ItemContainer
+    public class WeaponEquipment : MonoBehaviour, IContainer<Item>
     {
 
         [SerializeField]
@@ -19,7 +19,7 @@ namespace OMTB.Gameplay
 
 
 
-        protected override void Awake()
+        void Awake()
         {
             if (Instance == null)
             {
@@ -40,7 +40,7 @@ namespace OMTB.Gameplay
                 // Set onSave handle
                 //CacheManager.SetHandleOnSave(HW.Constants.InventoryFileName, HandleCacheManagerOnSave);
 
-                base.Awake();
+                
 
                 DontDestroyOnLoad(gameObject);
             }
@@ -48,7 +48,7 @@ namespace OMTB.Gameplay
                 GameObject.Destroy(gameObject);
         }
 
-        public override int GetFreeRoom(int index, Item item)
+        public int GetFreeRoom(int index, Item item)
         {
             Debug.Log("GetFreeRoom");
             // Is not a weapon or a shield or is a shield but the current hand is the right one
@@ -57,7 +57,47 @@ namespace OMTB.Gameplay
 
             Debug.Log("GetFreeRoom:aaaaaaaaaa");
 
-            return base.GetFreeRoom(index, item);
+            return 1;
+        }
+
+        public void SetOnChanged(UnityAction handle)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UnsetOnChanged(UnityAction handle)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsEmpty(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Item GetElement(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetQuantity(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Insert(int index, Item item, int quantity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Remove(int index, int quantity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Move(int srcIndex, int dstIndex, int quantity)
+        {
+            throw new NotImplementedException();
         }
 
 

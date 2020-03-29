@@ -45,7 +45,7 @@ namespace OMTB.UI
             int index = indexable.GetIndex();
 
             // Get the container
-            IItemContainer container = indexable.GetContainer() as IItemContainer;
+            IContainer<Item> container = indexable.GetContainer();
          
             // Get the image component
             Image image = GetComponent<Image>();
@@ -55,17 +55,17 @@ namespace OMTB.UI
             {
                 image.enabled = true;
                
-                Item item = container.GetItem(index);
+                Item item = container.GetElement(index);
 
                 // If is not a big slot then show the icon as it is
-                if (!item.HasBigSlot)
+                if (!item.TakesMoreSlots)
                 {
                     image.sprite = item.Icon;
                 }
                 else // It's a big slot, lets do some puzzle
                 {
                     
-                    if(container.IsRoot(index))
+                    if((container as IBigSlotContainer).IsRoot(index))
                     {
                         image.sprite = SpriteUtil.GetSprite(item.Icon.texture, (int)item.SlotShape.x, (int)item.SlotShape.y, 0, 0);
                     }
@@ -74,7 +74,7 @@ namespace OMTB.UI
 
                         Vector2 coords;
                         
-                        if (container.TryGetCoordsInBigSlot(index, out coords))
+                        if ((container as IBigSlotContainer).TryGetCoordsInBigSlot(index, out coords))
                             image.sprite = SpriteUtil.GetSprite(item.Icon.texture, (int)item.SlotShape.x, (int)item.SlotShape.y, (int)coords.x, (int)coords.y);
 
 

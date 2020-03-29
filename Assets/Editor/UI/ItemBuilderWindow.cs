@@ -97,8 +97,7 @@ namespace OMTB.Editor
                     {
                         Name = weaponName,
                         Grip = (WeaponGrip)weaponGrip,
-                        MaxQuantityPerSlot = 5,
-                        HasBigSlot = false
+                        MaxQuantityPerSlot = 5
                     });
 
 

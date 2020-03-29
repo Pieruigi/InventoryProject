@@ -1250,8 +1250,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e58e733e15761b4f94cff42ce94fbfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  columns: 2
-  rows: 3
   hand: 0
 --- !u!4 &554382222
 Transform:
@@ -3013,7 +3011,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1983186681}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13b81faadb954c648a712ce216d9d40f, type: 3}
+  m_Script: {fileID: 11500000, guid: 1b9f675d57ea2af42b8a0b1d62f843db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   columns: 8

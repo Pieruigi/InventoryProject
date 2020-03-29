@@ -27,7 +27,7 @@ namespace OMTB.UI
         private static GameObject rightReceiver;
 
         int index;
-        IItemContainer container;
+        IContainer<Item> container;
 
         //private static GameObject selected;
 
@@ -47,7 +47,7 @@ namespace OMTB.UI
 
             if (!container.IsEmpty(index))
             {
-                Item item = container.GetItem(index);
+                Item item = container.GetElement(index);
             }        
         }
 
@@ -72,7 +72,7 @@ namespace OMTB.UI
 
         public virtual void SetContainer(IContainer<Item> container)
         {
-            this.container = container as IItemContainer;
+            this.container = container as IContainer<Item>;
         }
 
         public void OnBeginDrag(PointerEventData eventData)

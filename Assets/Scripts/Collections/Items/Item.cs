@@ -19,8 +19,7 @@ namespace OMTB.Collection
 
         public int MaxQuantityPerSlot { get; set; } = -1;
 
-        public bool HasBigSlot { get; set; }
-
+        
         public Vector2 SlotShape { get; set; } = Vector2.one; // Columns x rows
 
     }
@@ -62,8 +61,8 @@ namespace OMTB.Collection
 
         [SerializeField]
         //[ReadOnly]
-        private bool hasBigSlot = false;
-        public bool HasBigSlot { get { return hasBigSlot; } }
+        
+        public bool TakesMoreSlots { get { return slotShape != Vector2.one; } }
 
         [SerializeField]
         //[ReadOnly]
@@ -101,9 +100,11 @@ namespace OMTB.Collection
 
             shortDesc = c.ShortDescription;
 
-            hasBigSlot = c.HasBigSlot;
             slotShape = c.SlotShape;
-    
+            if (slotShape.x == 0)
+                slotShape.x = 1;
+            if (slotShape.y == 0)
+                slotShape.y = 1;
 
         }
 

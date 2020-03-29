@@ -61,7 +61,7 @@ namespace OMTB.UI
             Image image = GetComponent<Image>();
           
             // Set icon and resize
-            Item item = (source.GetContainer() as IItemContainer).GetItem(source.GetIndex());
+            Item item = (source.GetContainer() as IContainer<Item>).GetElement(source.GetIndex());
             image.sprite = item.Icon;
             (transform as RectTransform).sizeDelta = new Vector2(baseWidth*item.SlotShape.x, baseHeight * item.SlotShape.y);
             (transform as RectTransform).pivot = new Vector2(0f, 1f);
@@ -83,14 +83,17 @@ namespace OMTB.UI
             if (dest != null)
             {
                
+                // I need a controller to define behaviour when moving items from one container to another
+                ///////////////////////////////////////////
+
                 // Get destination container
-                IItemContainer dstContainer = dest.GetContainer() as IItemContainer;
+                IContainer<Item> dstContainer = dest.GetContainer();
                 int dstIdx = dest.GetIndex();
 
                 // Get source data
-                IItemContainer srcContainer = source.GetContainer() as IItemContainer;
+                IContainer<Item> srcContainer = source.GetContainer();
                 int srcIdx = source.GetIndex();
-                Item item = srcContainer.GetItem(source.GetIndex());
+                Item item = srcContainer.GetElement(source.GetIndex());
 
                 // Try add the item to the destination container
                 int quantity = 0;
@@ -103,7 +106,7 @@ namespace OMTB.UI
                     int q = dstContainer.GetFreeRoom(dstIdx, item);
 
                     // If there is no room or I'm not moving the item at all then do nothing
-                    if ((q <= 0) || ((dstContainer == srcContainer) && (dstIdx == srcIdx || srcContainer.GetRootIndex(srcIdx) == srcContainer.GetRootIndex(dstIdx))))
+                    if ((q <= 0) || ((dstContainer == srcContainer) && (dstIdx == srcIdx || (srcContainer as IBigSlotContainer).GetRootIndex(srcIdx) == (srcContainer as IBigSlotContainer).GetRootIndex(dstIdx))))
                         open = false;
                     
                     // If there is free room but only for a single object you don't need to open the quantity selector panel, then simply add the object ( this
@@ -116,35 +119,25 @@ namespace OMTB.UI
                     Debug.Log(string.Format("q:{0}", q));
                     if (open)
                     {
-                        if(q > 1 && srcQ > 1)
+                        int max = Mathf.Min(q, srcQ);
+
+                        CounterSliderUI.Instance.Show(1, max /*srcContainer.GetQuantity(srcIdx)*/, (int a) =>
                         {
-                            int max = Mathf.Min(q, srcQ);
+                            // Move items
+                            srcContainer.Move(srcIdx, dstIdx, a);
 
-                            CounterSliderUI.Instance.Show(1, max /*srcContainer.GetQuantity(srcIdx)*/, (int a) =>
-                            {
-                                // Move items
-                                srcContainer.Move(srcIdx, dstIdx, dstContainer, a);
+                        }, () => { });
 
-                            }, () => { });
-                        }
-                       
-                        
                     }
-                    else
-                    {
-                        if (q == 1 || srcQ >= 1)
-                            srcContainer.Move(srcIdx, dstIdx, dstContainer, 1);
-                    }
-
+                 
                 }
                 else
                 {
-                    if(dstContainer.GetFreeRoom(dstIdx, item) > 0)
-                    {
-                        quantity = 1;
-                        // Move items
-                        srcContainer.Move(srcIdx, dstIdx, dstContainer, quantity);
-                    }
+
+                    quantity = 1;
+                    // Move items
+                    srcContainer.Move(srcIdx, dstIdx, quantity);
+
                     
                     
                 }

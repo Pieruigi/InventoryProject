@@ -42,11 +42,11 @@ namespace OMTB.UI
         void CheckContainer()
         {
             int index = indexable.GetIndex();
-            IItemContainer container = indexable.GetContainer() as IItemContainer;
+            IContainer<Item> container = indexable.GetContainer();
 
             if (!container.IsEmpty(index))
             {
-                GetComponent<Text>().text = container.GetItem(index).Name;
+                GetComponent<Text>().text = container.GetElement(index).Name;
                 
             }
             else

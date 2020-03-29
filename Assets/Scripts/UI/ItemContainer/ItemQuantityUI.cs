@@ -44,23 +44,23 @@ namespace OMTB.UI
         void CheckContainer()
         {
             int index = indexable.GetIndex();
-            IItemContainer container = indexable.GetContainer() as IItemContainer;
+            IContainer<Item> container = indexable.GetContainer() as IContainer<Item>;
             // Get the text
             Text text = GetComponent<Text>();
 
             // Check if there is an item at index
             if (!container.IsEmpty(index))
             {
-                if (!container.GetItem(index).HasBigSlot)
+                if (!container.GetElement(index).TakesMoreSlots)
                 {
                     text.text = container.GetQuantity(index).ToString();
                 }
                 else
                 {
                     // We show the quantity to the bottom right
-                    Item item = container.GetItem(index);
+                    Item item = container.GetElement(index);
                     Vector2 coords;
-                    container.TryGetCoordsInBigSlot(index, out coords);
+                    (container as IBigSlotContainer).TryGetCoordsInBigSlot(index, out coords);
 
                     if(coords.x == item.SlotShape.x-1 && coords.y == item.SlotShape.y - 1)
                         text.text = container.GetQuantity(index).ToString();
