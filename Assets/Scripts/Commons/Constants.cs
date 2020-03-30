@@ -9,4 +9,11 @@ namespace OMTB
         
     }
 
+    public class KeyBindings
+    {
+        public static readonly KeyCode DrawMultiple = KeyCode.LeftControl;
+
+
+    }
+
 }

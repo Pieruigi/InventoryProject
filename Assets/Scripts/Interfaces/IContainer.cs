@@ -21,6 +21,8 @@ namespace OMTB.Interface
 
         int Insert(int index, T item, int quantity);
 
+        int Insert(T item, int quantity);
+
         int Remove(int index, int quantity);
 
         int Move(int srcIndex, int dstIndex, int quantity);

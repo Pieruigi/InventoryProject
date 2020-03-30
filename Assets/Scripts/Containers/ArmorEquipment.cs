@@ -5,17 +5,16 @@ using OMTB.Collection;
 using UnityEngine.Events;
 using OMTB.Interface;
 
-namespace OMTB.Gameplay
+namespace OMTB.Container
 {
-    public enum Hand { Left, Right }
 
-    public class WeaponEquipment : MonoBehaviour, IContainer<Item>
+    public class ArmorEquipment : MonoBehaviour, IContainer<Item>
     {
 
         [SerializeField]
-        Hand hand;
+        ArmorBodyPart bodyPart;
 
-        public static WeaponEquipment Instance { get; private set; }
+        public static ArmorEquipment Instance { get; private set; }
 
 
 
@@ -40,7 +39,6 @@ namespace OMTB.Gameplay
                 // Set onSave handle
                 //CacheManager.SetHandleOnSave(HW.Constants.InventoryFileName, HandleCacheManagerOnSave);
 
-                
 
                 DontDestroyOnLoad(gameObject);
             }
@@ -50,12 +48,8 @@ namespace OMTB.Gameplay
 
         public int GetFreeRoom(int index, Item item)
         {
-            Debug.Log("GetFreeRoom");
-            // Is not a weapon or a shield or is a shield but the current hand is the right one
-            //if ( !item.GetType().IsSubclassOf(typeof(Weapon)) || item.GetType() != typeof(Shield) || (item.GetType() == typeof(Shield) && hand == Hand.Right))
-            //    return 0;
-
-            Debug.Log("GetFreeRoom:aaaaaaaaaa");
+            if (item.GetType() != typeof(Armor) || (item as Armor).BodyPart != bodyPart)
+                return 0;
 
             return 1;
         }
@@ -96,6 +90,11 @@ namespace OMTB.Gameplay
         }
 
         public int Move(int srcIndex, int dstIndex, int quantity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Insert(Item item, int quantity)
         {
             throw new NotImplementedException();
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using OMTB.UI;
 using UnityEngine.UI;
-using OMTB.Gameplay;
+using OMTB.Container;
 using OMTB.Collection;
 
 
@@ -13,7 +13,7 @@ public class _InventoryTest : MonoBehaviour
     InventoryUI inventoryUI;
 
     [SerializeField]
-    InventoryUI weaponLeftHandUI;
+    EquipmentUI equipmentUI;
 
     [SerializeField]
     InputField singleAddName;
@@ -40,7 +40,7 @@ public class _InventoryTest : MonoBehaviour
     [SerializeField]
     Text txtGetResult;
 
-    List<TestItem> items;
+    List<Item> items;
 
     [SerializeField]
     InputField commonSlot;
@@ -62,7 +62,7 @@ public class _InventoryTest : MonoBehaviour
         btnCountByIndex.onClick.AddListener(HandleCountByIndexOnClick);
 
         // Load all the resources
-        items = new List<TestItem>( Resources.LoadAll<TestItem>(OMTB.Configuration.ResourcesConfiguration.ItemsPath + "Test"));
+        items = new List<Item>( Resources.LoadAll<Item>(OMTB.Configuration.ResourcesConfiguration.ItemsPath));
         Debug.Log("Resources.Count:" + items.Count);
 
         
@@ -76,12 +76,12 @@ public class _InventoryTest : MonoBehaviour
             if (inventoryUI.IsOpened)
             {
                 inventoryUI.Close();
-                weaponLeftHandUI.Close();
+                equipmentUI.Close();
             }
             else
             {
                 inventoryUI.Open();
-                weaponLeftHandUI.Open();
+                equipmentUI.Open();
             }
                 
         }

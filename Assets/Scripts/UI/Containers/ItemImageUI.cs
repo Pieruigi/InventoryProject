@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using OMTB.Gameplay;
 using OMTB.Collection;
 using OMTB.Utility;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace OMTB.UI
 {
@@ -15,6 +17,7 @@ namespace OMTB.UI
         // Start is called before the first frame update
         void Start()
         {
+            
             indexable = GetComponentInParent<IIndexable<Item>>();
 
             indexable.GetContainer().SetOnChanged(HandleContainerOnChanged);
@@ -58,14 +61,15 @@ namespace OMTB.UI
                 Item item = container.GetElement(index);
 
                 // If is not a big slot then show the icon as it is
-                if (!item.TakesMoreSlots)
+                Debug.Log("Type:" + container.GetType().IsSubclassOf(typeof(IBigSlotContainer)));
+                if (!item.TakesMoreSlots || !new List<System.Type>(container.GetType().GetInterfaces()).Contains(typeof(IBigSlotContainer)))
                 {
                     image.sprite = item.Icon;
                 }
                 else // It's a big slot, lets do some puzzle
                 {
                     
-                    if((container as IBigSlotContainer).IsRoot(index))
+                    if ((container as IBigSlotContainer).IsRoot(index))
                     {
                         image.sprite = SpriteUtil.GetSprite(item.Icon.texture, (int)item.SlotShape.x, (int)item.SlotShape.y, 0, 0);
                     }
@@ -73,12 +77,14 @@ namespace OMTB.UI
                     {
 
                         Vector2 coords;
-                        
+
                         if ((container as IBigSlotContainer).TryGetCoordsInBigSlot(index, out coords))
                             image.sprite = SpriteUtil.GetSprite(item.Icon.texture, (int)item.SlotShape.x, (int)item.SlotShape.y, (int)coords.x, (int)coords.y);
 
 
                     }
+                    
+            
                 }
                 
             }

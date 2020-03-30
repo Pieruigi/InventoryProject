@@ -51,7 +51,7 @@ namespace OMTB.UI
             // Check if there is an item at index
             if (!container.IsEmpty(index))
             {
-                if (!container.GetElement(index).TakesMoreSlots)
+                if (!container.GetElement(index).TakesMoreSlots || !new List<System.Type>(container.GetType().GetInterfaces()).Contains(typeof(IBigSlotContainer)))
                 {
                     text.text = container.GetQuantity(index).ToString();
                 }

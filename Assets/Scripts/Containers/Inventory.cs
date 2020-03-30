@@ -5,7 +5,7 @@ using OMTB.Collection;
 using UnityEngine.Events;
 using OMTB.Interface;
 
-namespace OMTB.Gameplay
+namespace OMTB.Container
 {
     public class ItemContainerConfig
     {
@@ -15,34 +15,10 @@ namespace OMTB.Gameplay
         public int Columns { get; set; }
     }
   
-    public class Inventory: MonoBehaviour, IBigSlotContainer
+    public class Inventory: ItemContainer, IBigSlotContainer
     {
-        /**
-         * Internal data to manage items
-         * */
-        [System.Serializable]
-        private class Slot
-        {
-            public Item Item { get; set; }
 
-            public int Quantity { get; set; } = 0;
-           
-            public Slot(Item item)
-            {
-                Item = item;
-            }
-
-            public Slot(Item item, int quantity)
-            {
-                Item = item;
-                Quantity = quantity;
-            }
-        }
-
-        /**
-         * Called every time something changes in the inventory.
-         * */
-        public UnityAction OnChanged;
+        
 
         //protected abstract ItemContainerConfig GetConfiguration();
 
@@ -101,15 +77,7 @@ namespace OMTB.Gameplay
 
         }
 
-        public void SetOnChanged(UnityAction handle)
-        {
-            OnChanged += handle;
-        }
 
-        public void UnsetOnChanged(UnityAction handle)
-        {
-            OnChanged -= handle;
-        }
 
         #region GET
         /**
